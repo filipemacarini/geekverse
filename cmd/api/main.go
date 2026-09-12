@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"geekverse/internal/platform/database"
 	"geekverse/internal/platform/httperr"
 	"log"
 	"net/http"
@@ -15,6 +16,9 @@ import (
 
 func main() {
 	_ = godotenv.Load()
+
+	db := database.NewDatabase()
+	_ = db
 
 	r := chi.NewRouter()
 
