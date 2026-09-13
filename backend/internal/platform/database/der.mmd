@@ -1,0 +1,67 @@
+erDiagram
+PROFILES ||--o{ ARTS : ""
+PROFILES ||--o{ FAVORITES : ""
+TITLES ||--o{ FAVORITES : ""
+
+TITLES ||--o{ CONTENTS : ""
+TITLES ||--o{ TITLE_GENRES : ""
+GENRES ||--o{ TITLE_GENRES : ""
+
+PROFILES {
+    uuid id PK
+    string username
+    string email
+    string avatar_url
+    string role "user | moderator | content_manager | admin"
+    timestamp created_at
+}
+
+TITLES {
+    int id PK
+    string name
+    string synopsis
+    string cover_url
+    string banner_url
+    string type "anime | manga | novel"
+    string age_rating "L | 12 | 14 | 16 | 18"
+    string status "releasing | completed"
+    string source
+    year publication_year
+}
+
+CONTENTS {
+    int id PK
+    int title_id FK
+    string title
+    int season
+    float episode
+    string language "sub | dub | none"
+    string source_url
+    string cover_url
+}
+
+GENRES {
+    int id PK
+    string name
+}
+
+TITLE_GENRES {
+    int title_id PK, FK
+    int genre_id PK, FK
+}
+
+ARTS {
+    int id PK
+    uuid author_id FK
+    string title
+    string description
+    string image_url
+    int likes_count
+    timestamp created_at
+}
+
+FAVORITES {
+    uuid user_id PK, FK
+    int title_id PK, FK
+    timestamp created_at
+}
