@@ -6,4 +6,6 @@ type Favorite struct {
 	ProfileID string    `json:"profile_id" gorm:"type:uuid;primaryKey"`
 	TitleID   uint      `json:"title_id" gorm:"primaryKey"`
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
+
+	Title Title `json:"title,omitempty" gorm:"foreignKey:TitleID;constraint:OnDelete:CASCADE"`
 }
