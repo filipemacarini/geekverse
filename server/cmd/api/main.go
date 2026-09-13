@@ -17,7 +17,22 @@ import (
 func main() {
 	_ = godotenv.Load()
 
-	db := database.NewDatabase()
+	connectionString := os.Getenv("DATABASE_URL")
+	db, err := database.NewDatabase(connectionString)
+	if err != nil {
+		log.Fatalf("Falha ao conectar no banco de dados: %v", err)
+	}
+	fmt.Println("Conexão com Supabase/PostgreSQL estabelecida")
+
+	autoMigrate := os.Getenv("AUTO_MIGRATE")
+	if autoMigrate == "true" {
+		fmt.Println("Executando migrações")
+		if err := database.Migrate(db); err != nil {
+			log.Fatalf("Falha ao executar migrações: %v", err)
+		}
+		fmt.Println("Migrações executadas com sucesso")
+	}
+
 	_ = db
 
 	r := chi.NewRouter()

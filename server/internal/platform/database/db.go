@@ -1,28 +1,39 @@
 package database
 
 import (
-	"fmt"
+	"errors"
 	"log"
 	"os"
+	"time"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
-func NewDatabase() *gorm.DB {
-	cs := os.Getenv("DATABASE_URL")
+func NewDatabase(cs string) (*gorm.DB, error) {
 	if cs == "" {
-		log.Fatal("DATABASE_URL não configurada no arquivo .env")
+		return nil, errors.New("DATABASE_URL não configurada no .env")
 	}
 
-	db, err := gorm.Open(postgres.Open(cs), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
-	})
+	config := &gorm.Config{Logger: newLogger()}
+
+	db, err := gorm.Open(postgres.Open(cs), config)
 	if err != nil {
-		log.Fatalf("Falha ao conectar no Supabase/Postgres: %v", err)
+		return nil, err
 	}
 
-	fmt.Println("Conexão com Supabase/PostgreSQL estabelecida")
-	return db
+	return db, nil
+}
+
+func newLogger() logger.Interface {
+	return logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags),
+		logger.Config{
+			SlowThreshold:             time.Second,
+			LogLevel:                  logger.Warn,
+			IgnoreRecordNotFoundError: true,
+			Colorful:                  true,
+		},
+	)
 }
