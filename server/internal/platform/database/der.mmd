@@ -52,7 +52,7 @@ TITLE_GENRES {
 
 ARTS {
     int id PK
-    uuid author_id FK
+    uuid profile_id FK
     string title
     string description
     string image_url
@@ -61,7 +61,7 @@ ARTS {
 }
 
 FAVORITES {
-    uuid user_id PK, FK
+    uuid profile_id PK, FK
     int title_id PK, FK
     timestamp created_at
 }
