@@ -8,12 +8,19 @@ import (
 	"net/http"
 	"os"
 
+	_ "geekverse/docs"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
+	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
+// @title GeekVerse API
+// @version 1.0
+// @description API central da plataforma GeekVerse (Streaming, Leitura e Galeria de Artes).
+// @BasePath /
 func main() {
 	_ = godotenv.Load()
 
@@ -56,6 +63,8 @@ func main() {
 			"projeto": "GeekVerse - EXPOCEEP",
 		}, http.StatusOK, nil
 	}))
+
+	r.Get("/swagger/*", httpSwagger.WrapHandler)
 
 	port := os.Getenv("PORT")
 	if port == "" {
