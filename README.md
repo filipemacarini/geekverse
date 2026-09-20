@@ -1,30 +1,42 @@
 # GeekVerse
 
-GeekVerse é uma plataforma que centraliza streaming de animes, leitura de mangás e ebooks, além de uma galeria interativa para artistas da comunidade.
+O **GeekVerse** é uma plataforma centralizada para a cultura geek, unindo streaming de animes, leitura de mangás e novels, além de uma galeria interativa para divulgação de artes da comunidade.
 
-Este projeto está sendo desenvolvido para a ExpoCEEP.
+Projeto desenvolvido para a **ExpoCEEP 2026** pelo Curso Técnico em Desenvolvimento de Sistemas.
 
 ---
 
 ## Funcionalidades
 
-- **📺 Animes & Mangás:** Integração com provedores externos para streaming e leitura (inspirado na lógica do Mihon).
-- **📚 Ebooks:** Biblioteca digital com suporte a armazenamento de arquivos PDF/EPUB.
-- **🎨 Galeria da Comunidade:** Espaço exclusivo onde usuários podem fazer upload e divulgar suas próprias artes geeks.
+- **📺 Animes & Mangás:** Catálogo unificado com reprodução e integração com provedores externos (inspirado na lógica do Mihon/Tachiyomi).
+- **📚 Ebooks & Novels:** Leitura digital organizada por volumes e armazenamento dedicado de arquivos.
+- **🎨 Galeria da Comunidade (UGC):** Espaço exclusivo onde usuários publicam e divulgam suas próprias artes originais.
+- **🛡️ Controle de Acesso (RBAC):** Níveis de permissão para Usuário Comum, Moderador, Gerente de Conteúdo e Administrador.
+ 
+---
+
+## Stack Tecnológica
+
+| Camada             | Tecnologia                                                                                         |
+| :----------------- | :------------------------------------------------------------------------------------------------- |
+| **Backend**        | [Golang](https://go.dev/) + [Chi Router](https://github.com/go-chi/chi) + [GORM](https://gorm.io/) |
+| **Frontend**       | [TypeScript](https://www.typescriptlang.org/) + [React](https://react.dev/)                        |
+| **Banco de Dados** | [PostgreSQL](https://www.postgresql.org/) (Hospedado no [Supabase](https://supabase.com/))         |
+| **Armazenamento**  | [Supabase Storage](https://supabase.com/storage)                                                   |
 
 ---
 
-## Stack
+## Documentação do Projeto
 
-- **Backend:** Golang (CHI)
-- **Frontend:** React.js
-- **Database e Storage:** Supabase
-
+- [Diagrama Entidade-Relacionamento (DER)](/docs/der.png)
+- [Especificação OpenAPI (Swagger JSON)](server/docs/swagger.json)
+- [Documentação Interativa (Swagger UI)](http://localhost:5000/swagger/index.html): É necessário que o servidor esteja sendo executado localmente
+  
 ---
 
 ## Equipe e Responsabilidades
 
-*   **Filipe:** Backend
-*   **Vinicius:** Frontend
-*   **Leonardo:** Frontend
-*   **Lorenzo:** Frontend
+- **Filipe:** Backend
+- **Vinicius:** Frontend
+- **Leonardo:** Frontend
+- **Lorenzo:** Frontend
