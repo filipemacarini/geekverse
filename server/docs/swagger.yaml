@@ -1,5 +1,4 @@
 basePath: /
-host: localhost:5000
 info:
   contact: {}
   description: API central da plataforma GeekVerse (Streaming, Leitura e Galeria de

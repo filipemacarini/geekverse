@@ -1,0 +1,43 @@
+GET http://localhost:5000
+
+###
+
+GET http://localhost:5000/titles
+
+###
+
+GET http://localhost:5000/titles?type=novel
+
+###
+
+GET http://localhost:5000/titles/{{titleId}}
+
+### 
+
+# @name createTitle
+POST http://localhost:5000/titles
+Content-Type: application/json
+
+{
+    "name": "Teste",
+    "synopsis": "Sinópse Teste",
+    "cover_url": "http://teste.com/cover.png",
+    "banner_url": "http://teste.com/banner.png",
+    "type": "novel",
+    "age_rating": "L",
+    "status": "completed",
+    "source": "http://teste.com/source",
+    "publication_year": 2026
+}
+
+@titleId = {{createTitle.response.body.id}}
+
+###
+
+PATCH  http://localhost:5000/titles/{{titleId}}
+Content-Type: application/json
+
+{
+    "age_rating": "16",
+    "publication_year": 2024
+}
