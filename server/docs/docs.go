@@ -14,7 +14,372 @@ const docTemplate = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {}
+    "paths": {
+        "/titles": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Title"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "parameters": [
+                    {
+                        "description": "Dados da Obra",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/title.createRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Title"
+                        }
+                    }
+                }
+            }
+        },
+        "/titles/{id}": {
+            "get": {
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Obra",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Title"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Obra",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Obra",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Campos para atualizar",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/title.updateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Title"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "domain.Content": {
+            "type": "object",
+            "required": [
+                "language",
+                "source_url",
+                "title",
+                "title_id"
+            ],
+            "properties": {
+                "cover_url": {
+                    "type": "string"
+                },
+                "episode": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "language": {
+                    "type": "string",
+                    "enum": [
+                        "sub",
+                        "dub",
+                        "none"
+                    ]
+                },
+                "season": {
+                    "type": "integer",
+                    "minimum": 0
+                },
+                "source_url": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 150,
+                    "minLength": 2
+                },
+                "title_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "domain.Genre": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 2
+                },
+                "titles": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.Title"
+                    }
+                }
+            }
+        },
+        "domain.Title": {
+            "type": "object",
+            "required": [
+                "age_rating",
+                "cover_url",
+                "name",
+                "publication_year",
+                "status",
+                "type"
+            ],
+            "properties": {
+                "age_rating": {
+                    "type": "string",
+                    "enum": [
+                        "L",
+                        "12",
+                        "14",
+                        "16",
+                        "18"
+                    ]
+                },
+                "banner_url": {
+                    "type": "string"
+                },
+                "contents": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.Content"
+                    }
+                },
+                "cover_url": {
+                    "type": "string"
+                },
+                "genres": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.Genre"
+                    }
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 150,
+                    "minLength": 2
+                },
+                "publication_year": {
+                    "type": "integer"
+                },
+                "source": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "releasing",
+                        "completed"
+                    ]
+                },
+                "synopsis": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "anime",
+                        "manga",
+                        "novel"
+                    ]
+                }
+            }
+        },
+        "title.createRequest": {
+            "type": "object",
+            "required": [
+                "age_rating",
+                "cover_url",
+                "name",
+                "publication_year",
+                "status",
+                "type"
+            ],
+            "properties": {
+                "age_rating": {
+                    "type": "string",
+                    "enum": [
+                        "L",
+                        "12",
+                        "14",
+                        "16",
+                        "18"
+                    ],
+                    "example": "16"
+                },
+                "banner_url": {
+                    "type": "string",
+                    "example": "https://exemplo.com/banner.jpg"
+                },
+                "cover_url": {
+                    "type": "string",
+                    "example": "https://exemplo.com/capa.jpg"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 150,
+                    "minLength": 2,
+                    "example": "Solo Leveling"
+                },
+                "publication_year": {
+                    "type": "integer",
+                    "example": 2024
+                },
+                "source": {
+                    "type": "string",
+                    "example": "ID000001"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "releasing",
+                        "completed"
+                    ],
+                    "example": "releasing"
+                },
+                "synopsis": {
+                    "type": "string",
+                    "example": "O caçador mais fraco do mundo..."
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "anime",
+                        "manga",
+                        "novel"
+                    ],
+                    "example": "anime"
+                }
+            }
+        },
+        "title.updateRequest": {
+            "type": "object",
+            "properties": {
+                "age_rating": {
+                    "type": "string",
+                    "enum": [
+                        "L",
+                        "12",
+                        "14",
+                        "16",
+                        "18"
+                    ]
+                },
+                "banner_url": {
+                    "type": "string"
+                },
+                "cover_url": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 150,
+                    "minLength": 2
+                },
+                "publication_year": {
+                    "type": "integer"
+                },
+                "source": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "releasing",
+                        "completed"
+                    ]
+                },
+                "synopsis": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "anime",
+                        "manga",
+                        "novel"
+                    ]
+                }
+            }
+        }
+    }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it

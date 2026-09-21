@@ -55,6 +55,8 @@ func (h *Handler) Routes() chi.Router {
 	return r
 }
 
+// @Success 200 {array} domain.Title
+// @Router /titles [get]
 func (h *Handler) List(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	mediaType := r.URL.Query().Get("type")
 	titles, err := h.store.FindAll(mediaType)
@@ -64,6 +66,9 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) (interface{}, int
 	return titles, http.StatusOK, nil
 }
 
+// @Param id path int true "ID da Obra"
+// @Success 200 {object} domain.Title
+// @Router /titles/{id} [get]
 func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
@@ -80,6 +85,9 @@ func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) (interface{}, 
 	return title, http.StatusOK, nil
 }
 
+// @Param request body createRequest true "Dados da Obra"
+// @Success 201 {object} domain.Title
+// @Router /titles [post]
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	var req createRequest
 	if err := render.DecodeJSON(r.Body, &req); err != nil {
@@ -109,6 +117,10 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) (interface{}, i
 	return &newTitle, http.StatusCreated, nil
 }
 
+// @Param id path int true "ID da Obra"
+// @Param request body updateRequest true "Campos para atualizar"
+// @Success 200 {object} domain.Title
+// @Router /titles/{id} [patch]
 func (h *Handler) Update(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
@@ -135,6 +147,9 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) (interface{}, i
 	return title, http.StatusOK, nil
 }
 
+// @Param id path int true "ID da Obra"
+// @Success 200 {object} map[string]string
+// @Router /titles/{id} [delete]
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {

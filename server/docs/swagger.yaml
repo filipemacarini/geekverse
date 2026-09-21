@@ -1,9 +1,264 @@
 basePath: /
+definitions:
+  domain.Content:
+    properties:
+      cover_url:
+        type: string
+      episode:
+        type: number
+      id:
+        type: integer
+      language:
+        enum:
+        - sub
+        - dub
+        - none
+        type: string
+      season:
+        minimum: 0
+        type: integer
+      source_url:
+        type: string
+      title:
+        maxLength: 150
+        minLength: 2
+        type: string
+      title_id:
+        type: integer
+    required:
+    - language
+    - source_url
+    - title
+    - title_id
+    type: object
+  domain.Genre:
+    properties:
+      id:
+        type: integer
+      name:
+        maxLength: 50
+        minLength: 2
+        type: string
+      titles:
+        items:
+          $ref: '#/definitions/domain.Title'
+        type: array
+    required:
+    - name
+    type: object
+  domain.Title:
+    properties:
+      age_rating:
+        enum:
+        - L
+        - "12"
+        - "14"
+        - "16"
+        - "18"
+        type: string
+      banner_url:
+        type: string
+      contents:
+        items:
+          $ref: '#/definitions/domain.Content'
+        type: array
+      cover_url:
+        type: string
+      genres:
+        items:
+          $ref: '#/definitions/domain.Genre'
+        type: array
+      id:
+        type: integer
+      name:
+        maxLength: 150
+        minLength: 2
+        type: string
+      publication_year:
+        type: integer
+      source:
+        type: string
+      status:
+        enum:
+        - releasing
+        - completed
+        type: string
+      synopsis:
+        type: string
+      type:
+        enum:
+        - anime
+        - manga
+        - novel
+        type: string
+    required:
+    - age_rating
+    - cover_url
+    - name
+    - publication_year
+    - status
+    - type
+    type: object
+  title.createRequest:
+    properties:
+      age_rating:
+        enum:
+        - L
+        - "12"
+        - "14"
+        - "16"
+        - "18"
+        example: "16"
+        type: string
+      banner_url:
+        example: https://exemplo.com/banner.jpg
+        type: string
+      cover_url:
+        example: https://exemplo.com/capa.jpg
+        type: string
+      name:
+        example: Solo Leveling
+        maxLength: 150
+        minLength: 2
+        type: string
+      publication_year:
+        example: 2024
+        type: integer
+      source:
+        example: ID000001
+        type: string
+      status:
+        enum:
+        - releasing
+        - completed
+        example: releasing
+        type: string
+      synopsis:
+        example: O caçador mais fraco do mundo...
+        type: string
+      type:
+        enum:
+        - anime
+        - manga
+        - novel
+        example: anime
+        type: string
+    required:
+    - age_rating
+    - cover_url
+    - name
+    - publication_year
+    - status
+    - type
+    type: object
+  title.updateRequest:
+    properties:
+      age_rating:
+        enum:
+        - L
+        - "12"
+        - "14"
+        - "16"
+        - "18"
+        type: string
+      banner_url:
+        type: string
+      cover_url:
+        type: string
+      name:
+        maxLength: 150
+        minLength: 2
+        type: string
+      publication_year:
+        type: integer
+      source:
+        type: string
+      status:
+        enum:
+        - releasing
+        - completed
+        type: string
+      synopsis:
+        type: string
+      type:
+        enum:
+        - anime
+        - manga
+        - novel
+        type: string
+    type: object
 info:
   contact: {}
   description: API central da plataforma GeekVerse (Streaming, Leitura e Galeria de
     Artes).
   title: GeekVerse API
   version: "1.0"
-paths: {}
+paths:
+  /titles:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Title'
+            type: array
+    post:
+      parameters:
+      - description: Dados da Obra
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/title.createRequest'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Title'
+  /titles/{id}:
+    delete:
+      parameters:
+      - description: ID da Obra
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+    get:
+      parameters:
+      - description: ID da Obra
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Title'
+    patch:
+      parameters:
+      - description: ID da Obra
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Campos para atualizar
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/title.updateRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Title'
 swagger: "2.0"
