@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"geekverse/internal/platform/database"
 	"geekverse/internal/platform/httperr"
+	"geekverse/internal/title"
 	"log"
 	"net/http"
 	"os"
@@ -57,6 +58,8 @@ func main() {
 		MaxAge:           300,
 	}))
 
+	r.Get("/swagger/*", httpSwagger.WrapHandler)
+
 	r.Get("/", httperr.Wrap(func(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 		return map[string]string{
 			"status":  "sucesso",
@@ -64,7 +67,9 @@ func main() {
 		}, http.StatusOK, nil
 	}))
 
-	r.Get("/swagger/*", httpSwagger.WrapHandler)
+	titleStore := title.NewStore(db)
+	titleHandler := title.NewHandler(titleStore)
+	r.Mount("/titles", titleHandler.Routes())
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -72,6 +77,7 @@ func main() {
 	}
 
 	fmt.Printf("Servidor ouvindo em http://localhost:%s/\n", port)
+	fmt.Printf("Swagger UI http://localhost:%s/swagger/index.html\n", port)
 	if err := http.ListenAndServe(":"+port, r); err != nil {
 		log.Fatalf("Erro ao iniciar o servidor: %v", err)
 	}
