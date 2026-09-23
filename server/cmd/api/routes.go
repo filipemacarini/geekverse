@@ -2,6 +2,7 @@ package main
 
 import (
 	"geekverse/internal/content"
+	"geekverse/internal/genre"
 	"geekverse/internal/platform/httperr"
 	"geekverse/internal/platform/storage"
 	"geekverse/internal/title"
@@ -49,6 +50,10 @@ func setupRoutes(db *gorm.DB, storageClient *storage.Client) *chi.Mux {
 
 	storageHandler := storage.NewHandler(storageClient)
 	r.Mount("/upload", storageHandler.Routes())
+
+	genreStore := genre.NewStore(db)
+	genreHandler := genre.NewHandler(genreStore)
+	r.Mount("/genres", genreHandler.Routes())
 
 	return r
 }
