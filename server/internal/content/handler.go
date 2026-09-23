@@ -90,7 +90,10 @@ func (h *Handler) CreateBatch(w http.ResponseWriter, r *http.Request) (interface
 		})
 	}
 
-	if err := h.store.CreateBatch(contents); err != nil {
+	if err := h.store.CreateBatch(uint(titleID), contents); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, http.StatusNotFound, errors.New("obra não encontrada")
+		}
 		return nil, http.StatusInternalServerError, httperr.ErrInternal
 	}
 

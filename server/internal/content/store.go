@@ -14,7 +14,12 @@ func NewStore(db *gorm.DB) *Store {
 	return &Store{db: db}
 }
 
-func (s *Store) CreateBatch(contents []domain.Content) error {
+func (s *Store) CreateBatch(titleID uint, contents []domain.Content) error {
+	var title domain.Title
+	if err := s.db.Select("id").First(&title, titleID).Error; err != nil {
+		return err
+	}
+
 	return s.db.Create(contents).Error
 }
 
