@@ -40,6 +40,9 @@ func (h *Handler) Routes() chi.Router {
 	return r
 }
 
+// @Tags Genres
+// @Success 200 {array} domain.Genre
+// @Router /genres [get]
 func (h *Handler) List(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	genres, err := h.store.FindAll()
 	if err != nil {
@@ -48,6 +51,10 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) (interface{}, int
 	return genres, http.StatusOK, nil
 }
 
+// @Tags Genres
+// @Param request body []createItem true "Lista de Gêneros a cadastrar"
+// @Success 201 {array} domain.Genre
+// @Router /genres [post]
 func (h *Handler) CreateBatch(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	var req []createItem
 	if err := render.DecodeJSON(r.Body, &req); err != nil {
@@ -73,6 +80,10 @@ func (h *Handler) CreateBatch(w http.ResponseWriter, r *http.Request) (interface
 	return genres, http.StatusCreated, nil
 }
 
+// @Tags Genres
+// @Param request body []updateItem true "Lista de Gêneros a atualizar com seus IDs"
+// @Success 200 {object} map[string]string
+// @Router /genres [patch]
 func (h *Handler) UpdateBatch(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	var req []updateItem
 	if err := render.DecodeJSON(r.Body, &req); err != nil {
@@ -99,6 +110,10 @@ func (h *Handler) UpdateBatch(w http.ResponseWriter, r *http.Request) (interface
 	return map[string]string{"mensagem": "gêneros atualizados com sucesso"}, http.StatusOK, nil
 }
 
+// @Tags Genres
+// @Param id path int true "ID do Gênero"
+// @Success 200 {object} map[string]string
+// @Router /genres/{id} [delete]
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {

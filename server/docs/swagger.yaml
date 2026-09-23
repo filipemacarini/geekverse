@@ -157,57 +157,31 @@ definitions:
     - status
     - type
     type: object
-  title.createRequest:
+  genre.createItem:
     properties:
-      age_rating:
-        enum:
-        - L
-        - "12"
-        - "14"
-        - "16"
-        - "18"
-        example: "16"
-        type: string
-      banner_url:
-        example: https://exemplo.com/banner.jpg
-        type: string
-      cover_url:
-        example: https://exemplo.com/capa.jpg
-        type: string
       name:
-        example: Solo Leveling
-        maxLength: 150
+        example: Isekai
+        maxLength: 50
         minLength: 2
         type: string
-      publication_year:
-        example: 2024
+    required:
+    - name
+    type: object
+  genre.updateItem:
+    properties:
+      id:
+        example: 1
         type: integer
-      source:
-        example: ID000001
-        type: string
-      status:
-        enum:
-        - releasing
-        - completed
-        example: releasing
-        type: string
-      synopsis:
-        example: O caçador mais fraco do mundo...
-        type: string
-      type:
-        enum:
-        - anime
-        - manga
-        - novel
-        example: anime
+      name:
+        example: Ação
+        maxLength: 50
+        minLength: 2
         type: string
     required:
-    - age_rating
-    - cover_url
+    - id
     - name
-    - publication_year
-    - status
-    - type
+    type: object
+  title.createRequest:
     type: object
   title.updateRequest:
     properties:
@@ -223,6 +197,10 @@ definitions:
         type: string
       cover_url:
         type: string
+      genre_ids:
+        items:
+          type: integer
+        type: array
       name:
         maxLength: 150
         minLength: 2
@@ -289,6 +267,72 @@ paths:
             type: object
       tags:
       - Contents
+  /genres:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Genre'
+            type: array
+      tags:
+      - Genres
+    patch:
+      parameters:
+      - description: Lista de Gêneros a atualizar com seus IDs
+        in: body
+        name: request
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/genre.updateItem'
+          type: array
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      tags:
+      - Genres
+    post:
+      parameters:
+      - description: Lista de Gêneros a cadastrar
+        in: body
+        name: request
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/genre.createItem'
+          type: array
+      responses:
+        "201":
+          description: Created
+          schema:
+            items:
+              $ref: '#/definitions/domain.Genre'
+            type: array
+      tags:
+      - Genres
+  /genres/{id}:
+    delete:
+      parameters:
+      - description: ID do Gênero
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      tags:
+      - Genres
   /titles:
     get:
       responses:

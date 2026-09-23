@@ -67,6 +67,111 @@
                 }
             }
         },
+        "/genres": {
+            "get": {
+                "tags": [
+                    "Genres"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Genre"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Genres"
+                ],
+                "parameters": [
+                    {
+                        "description": "Lista de Gêneros a cadastrar",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/genre.createItem"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Genre"
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Genres"
+                ],
+                "parameters": [
+                    {
+                        "description": "Lista de Gêneros a atualizar com seus IDs",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/genre.updateItem"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/genres/{id}": {
+            "delete": {
+                "tags": [
+                    "Genres"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Gênero",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/titles": {
             "get": {
                 "tags": [
@@ -481,72 +586,41 @@
                 }
             }
         },
-        "title.createRequest": {
+        "genre.createItem": {
             "type": "object",
             "required": [
-                "age_rating",
-                "cover_url",
-                "name",
-                "publication_year",
-                "status",
-                "type"
+                "name"
             ],
             "properties": {
-                "age_rating": {
+                "name": {
                     "type": "string",
-                    "enum": [
-                        "L",
-                        "12",
-                        "14",
-                        "16",
-                        "18"
-                    ],
-                    "example": "16"
-                },
-                "banner_url": {
-                    "type": "string",
-                    "example": "https://exemplo.com/banner.jpg"
-                },
-                "cover_url": {
-                    "type": "string",
-                    "example": "https://exemplo.com/capa.jpg"
+                    "maxLength": 50,
+                    "minLength": 2,
+                    "example": "Isekai"
+                }
+            }
+        },
+        "genre.updateItem": {
+            "type": "object",
+            "required": [
+                "id",
+                "name"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
                 },
                 "name": {
                     "type": "string",
-                    "maxLength": 150,
+                    "maxLength": 50,
                     "minLength": 2,
-                    "example": "Solo Leveling"
-                },
-                "publication_year": {
-                    "type": "integer",
-                    "example": 2024
-                },
-                "source": {
-                    "type": "string",
-                    "example": "ID000001"
-                },
-                "status": {
-                    "type": "string",
-                    "enum": [
-                        "releasing",
-                        "completed"
-                    ],
-                    "example": "releasing"
-                },
-                "synopsis": {
-                    "type": "string",
-                    "example": "O caçador mais fraco do mundo..."
-                },
-                "type": {
-                    "type": "string",
-                    "enum": [
-                        "anime",
-                        "manga",
-                        "novel"
-                    ],
-                    "example": "anime"
+                    "example": "Ação"
                 }
             }
+        },
+        "title.createRequest": {
+            "type": "object"
         },
         "title.updateRequest": {
             "type": "object",
@@ -566,6 +640,12 @@
                 },
                 "cover_url": {
                     "type": "string"
+                },
+                "genre_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 },
                 "name": {
                     "type": "string",

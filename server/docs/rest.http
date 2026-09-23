@@ -21,7 +21,7 @@ POST http://localhost:5000/titles
 Content-Type: application/json
 
 {
-    "name": "Teste com contents",
+    "name": "Teste com contents e genres",
     "synopsis": "Sinópse Teste",
     "cover_url": "http://teste.com/cover.png",
     "banner_url": "http://teste.com/banner.png",
@@ -29,7 +29,8 @@ Content-Type: application/json
     "age_rating": "L",
     "status": "completed",
     "source": "http://teste.com/source",
-    "publication_year": 2026
+    "publication_year": 2026,
+    "genre_ids": [1, 3]
 }
 
 @titleId = {{createTitle.response.body.id}}
@@ -41,7 +42,7 @@ Content-Type: application/json
 
 {
     "age_rating": "18",
-    "publication_year": 2025
+    "genre_ids": [2, 1]
 }
 
 ###
@@ -101,11 +102,7 @@ Content-Type: application/json
 
 [
   {
-    "id": 15,
-    "title": "Episodio 1: Versao Estendida"
-  },
-  {
-    "id": 18,
+    "id": 36,
     "source_url": "https://novo-stream.com/ep2-remasterizado.mp4"
   }
 ]
@@ -113,3 +110,39 @@ Content-Type: application/json
 ###
 
 DELETE http://localhost:5000/contents/18
+
+### GENRES
+
+POST http://localhost:5000/genres
+Content-Type: application/json
+
+[
+  { "name": "Acao" },
+  { "name": "Fantasia" },
+  { "name": "Romance" },
+  { "name": "Isekai" }
+]
+
+###
+
+GET http://localhost:5000/genres
+
+###
+
+PATCH http://localhost:5000/genres
+Content-Type: application/json
+
+[
+  {
+    "id": 1,
+    "name": "Comédia"
+  },
+  {
+    "id": 2,
+    "name": "Ação"
+  }
+]
+
+###
+
+DELETE http://localhost:5000/genres/4
