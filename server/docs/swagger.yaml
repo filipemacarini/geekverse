@@ -313,6 +313,8 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/domain.Title'
+      tags:
+      - Titles
   /titles/{id}:
     delete:
       parameters:
@@ -328,6 +330,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      tags:
+      - Titles
     get:
       parameters:
       - description: ID da Obra
@@ -340,6 +344,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/domain.Title'
+      tags:
+      - Titles
     patch:
       parameters:
       - description: ID da Obra
@@ -358,6 +364,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/domain.Title'
+      tags:
+      - Titles
   /titles/{title_id}/contents:
     post:
       parameters:
@@ -383,4 +391,26 @@ paths:
             type: array
       tags:
       - Contents
+  /upload/{bucket}:
+    post:
+      parameters:
+      - description: Nome do Balde (novels ou arts)
+        in: path
+        name: bucket
+        required: true
+        type: string
+      - description: Arquivo a enviar
+        in: formData
+        name: file
+        required: true
+        type: file
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      tags:
+      - Storage
 swagger: "2.0"

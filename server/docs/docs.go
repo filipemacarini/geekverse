@@ -92,6 +92,9 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "tags": [
+                    "Titles"
+                ],
                 "parameters": [
                     {
                         "description": "Dados da Obra",
@@ -115,6 +118,9 @@ const docTemplate = `{
         },
         "/titles/{id}": {
             "get": {
+                "tags": [
+                    "Titles"
+                ],
                 "parameters": [
                     {
                         "type": "integer",
@@ -134,6 +140,9 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "tags": [
+                    "Titles"
+                ],
                 "parameters": [
                     {
                         "type": "integer",
@@ -156,6 +165,9 @@ const docTemplate = `{
                 }
             },
             "patch": {
+                "tags": [
+                    "Titles"
+                ],
                 "parameters": [
                     {
                         "type": "integer",
@@ -217,6 +229,40 @@ const docTemplate = `{
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/domain.Content"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/upload/{bucket}": {
+            "post": {
+                "tags": [
+                    "Storage"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Nome do Balde (novels ou arts)",
+                        "name": "bucket",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Arquivo a enviar",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
                             }
                         }
                     }
