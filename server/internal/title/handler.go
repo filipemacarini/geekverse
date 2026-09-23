@@ -156,15 +156,10 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) (interface{}, i
 		return nil, http.StatusBadRequest, errors.New("id inválido")
 	}
 
-	_, err = h.store.FindByID(uint(id))
-	if err != nil {
+	if err := h.store.Delete(uint(id)); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, http.StatusNotFound, errors.New("obra não encontrada")
 		}
-		return nil, http.StatusInternalServerError, httperr.ErrInternal
-	}
-
-	if err := h.store.Delete(uint(id)); err != nil {
 		return nil, http.StatusInternalServerError, httperr.ErrInternal
 	}
 

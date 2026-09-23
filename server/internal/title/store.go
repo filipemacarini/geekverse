@@ -52,5 +52,12 @@ func (s *Store) Update(id uint, updates interface{}) (*domain.Title, error) {
 }
 
 func (s *Store) Delete(id uint) error {
-	return s.db.Delete(&domain.Title{}, id).Error
+	result := s.db.Delete(&domain.Title{}, id)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
 }
