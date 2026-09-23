@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"geekverse/internal/content"
 	"geekverse/internal/platform/database"
 	"geekverse/internal/platform/httperr"
 	"geekverse/internal/title"
@@ -70,6 +71,11 @@ func main() {
 	titleStore := title.NewStore(db)
 	titleHandler := title.NewHandler(titleStore)
 	r.Mount("/titles", titleHandler.Routes())
+
+	contentStore := content.NewStore(db)
+	contentHandler := content.NewHandler(contentStore)
+	r.Mount("/titles/{title_id}/contents", contentHandler.TitleRoutes())
+	r.Mount("/contents", contentHandler.Routes())
 
 	port := os.Getenv("PORT")
 	if port == "" {
