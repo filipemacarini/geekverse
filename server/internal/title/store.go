@@ -20,7 +20,7 @@ func (s *Store) Create(title *domain.Title) error {
 
 func (s *Store) FindAll(mediaType string) ([]domain.Title, error) {
 	var titles []domain.Title
-	query := s.db.Model(&domain.Title{})
+	query := s.db.Model(&domain.Title{}).Preload("Genres")
 
 	if mediaType != "" {
 		query = query.Where("type = ?", mediaType)
@@ -39,16 +39,28 @@ func (s *Store) FindByID(id uint) (*domain.Title, error) {
 	return &title, nil
 }
 
-func (s *Store) Update(id uint, updates interface{}) (*domain.Title, error) {
-	var title domain.Title
-	if err := s.db.First(&title, id).Error; err != nil {
-		return nil, err
+func (s *Store) Update(id uint, updates map[string]interface{}) error {
+	if len(updates) == 0 {
+		return nil
 	}
 
-	if err := s.db.Model(&title).Updates(updates).Error; err != nil {
-		return nil, err
+	result := s.db.Model(&domain.Title{ID: id}).Updates(updates)
+	if result.Error != nil {
+		return result.Error
 	}
-	return &title, nil
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}
+
+func (s *Store) SetGenres(titleID uint, genreIDs []uint) error {
+	genres := make([]domain.Genre, 0, len(genreIDs))
+	for _, gID := range genreIDs {
+		genres = append(genres, domain.Genre{ID: gID})
+	}
+
+	return s.db.Model(&domain.Title{ID: titleID}).Association("Genres").Replace(&genres)
 }
 
 func (s *Store) Delete(id uint) error {

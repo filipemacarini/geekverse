@@ -1,6 +1,7 @@
 package title
 
 import (
+	"encoding/json"
 	"errors"
 	"geekverse/internal/domain"
 	"geekverse/internal/platform/httperr"
@@ -31,18 +32,22 @@ type createRequest struct {
 	Status          string `json:"status" validate:"required,oneof=releasing completed" example:"releasing"`
 	Source          string `json:"source" example:"ID000001"`
 	PublicationYear int    `json:"publication_year" validate:"required" example:"2024"`
+
+	GenreIDs []uint `json:"genre_ids" example:"[1, 3]"`
 }
 
 type updateRequest struct {
-	Name            *string `json:"name" validate:"omitempty,min=2,max=150"`
-	Synopsis        *string `json:"synopsis"`
-	CoverURL        *string `json:"cover_url" validate:"omitempty,url"`
-	BannerURL       *string `json:"banner_url" validate:"omitempty,url"`
-	Type            *string `json:"type" validate:"omitempty,oneof=anime manga novel"`
-	AgeRating       *string `json:"age_rating" validate:"omitempty,oneof=L 12 14 16 18"`
-	Status          *string `json:"status" validate:"omitempty,oneof=releasing completed"`
-	Source          *string `json:"source"`
-	PublicationYear *int    `json:"publication_year"`
+	Name            *string `json:"name,omitempty" validate:"omitempty,min=2,max=150"`
+	Synopsis        *string `json:"synopsis,omitempty"`
+	CoverURL        *string `json:"cover_url,omitempty" validate:"omitempty,url"`
+	BannerURL       *string `json:"banner_url,omitempty" validate:"omitempty,url"`
+	Type            *string `json:"type,omitempty" validate:"omitempty,oneof=anime manga novel"`
+	AgeRating       *string `json:"age_rating,omitempty" validate:"omitempty,oneof=L 12 14 16 18"`
+	Status          *string `json:"status,omitempty" validate:"omitempty,oneof=releasing completed"`
+	Source          *string `json:"source,omitempty"`
+	PublicationYear *int    `json:"publication_year,omitempty"`
+
+	GenreIDs []uint `json:"genre_ids,omitempty"`
 }
 
 func (h *Handler) Routes() chi.Router {
@@ -117,6 +122,12 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) (interface{}, i
 		return nil, http.StatusInternalServerError, httperr.ErrInternal
 	}
 
+	if len(req.GenreIDs) > 0 {
+		if err := h.store.SetGenres(newTitle.ID, req.GenreIDs); err != nil {
+			return nil, http.StatusInternalServerError, httperr.ErrInternal
+		}
+	}
+
 	return &newTitle, http.StatusCreated, nil
 }
 
@@ -140,15 +151,25 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) (interface{}, i
 		return nil, http.StatusBadRequest, err
 	}
 
-	title, err := h.store.Update(uint(id), req)
-	if err != nil {
+	var updates map[string]interface{}
+	data, _ := json.Marshal(req)
+	_ = json.Unmarshal(data, &updates)
+	delete(updates, "genre_ids")
+
+	if err := h.store.Update(uint(id), updates); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, http.StatusNotFound, errors.New("obra não encontrada")
 		}
 		return nil, http.StatusInternalServerError, httperr.ErrInternal
 	}
 
-	return title, http.StatusOK, nil
+	if req.GenreIDs != nil {
+		if err := h.store.SetGenres(uint(id), req.GenreIDs); err != nil {
+			return nil, http.StatusInternalServerError, httperr.ErrInternal
+		}
+	}
+
+	return map[string]string{"mensagem": "obra atualizada com sucesso"}, http.StatusOK, nil
 }
 
 // @Tags Titles
