@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/render"
+	"gorm.io/gorm"
 )
 
 var ErrInternal = errors.New("erro interno no servidor")
@@ -18,9 +19,12 @@ func Wrap(fn EndpointFunc) http.HandlerFunc {
 		if err != nil {
 			if errors.Is(err, ErrInternal) {
 				render.Status(r, http.StatusInternalServerError)
+			} else if errors.Is(err, gorm.ErrRecordNotFound) {
+				render.Status(r, http.StatusNotFound)
 			} else {
 				render.Status(r, http.StatusBadRequest)
 			}
+
 			render.JSON(w, r, map[string]string{"error": err.Error()})
 			return
 		}
