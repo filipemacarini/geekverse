@@ -23,6 +23,15 @@ func NewDatabase(cs string) (*gorm.DB, error) {
 		return nil, err
 	}
 
+	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, err
+	}
+
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxOpenConns(20)
+	sqlDB.SetConnMaxLifetime(time.Hour)
+
 	return db, nil
 }
 
