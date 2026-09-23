@@ -1,5 +1,63 @@
 basePath: /
 definitions:
+  content.createItem:
+    properties:
+      cover_url:
+        example: https://exemplo.com/capa-vol1.jpg
+        type: string
+      episode:
+        example: 1
+        type: number
+      language:
+        enum:
+        - sub
+        - dub
+        - none
+        example: sub
+        type: string
+      season:
+        example: 1
+        minimum: 0
+        type: integer
+      source_url:
+        example: https://stream.exemplo.com/ep1.mp4
+        type: string
+      title:
+        example: Episódio 1 - O Despertar
+        maxLength: 150
+        minLength: 2
+        type: string
+    required:
+    - language
+    - source_url
+    - title
+    type: object
+  content.updateItem:
+    properties:
+      cover_url:
+        type: string
+      episode:
+        type: number
+      id:
+        example: 1
+        type: integer
+      language:
+        enum:
+        - sub
+        - dub
+        - none
+        type: string
+      season:
+        type: integer
+      source_url:
+        type: string
+      title:
+        maxLength: 150
+        minLength: 2
+        type: string
+    required:
+    - id
+    type: object
   domain.Content:
     properties:
       cover_url:
@@ -194,6 +252,43 @@ info:
   title: GeekVerse API
   version: "1.0"
 paths:
+  /contents:
+    patch:
+      parameters:
+      - description: Lista de Atualizações com IDs
+        in: body
+        name: request
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/content.updateItem'
+          type: array
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      tags:
+      - Contents
+  /contents/{id}:
+    delete:
+      parameters:
+      - description: ID do Conteúdo
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      tags:
+      - Contents
   /titles:
     get:
       responses:
@@ -203,6 +298,8 @@ paths:
             items:
               $ref: '#/definitions/domain.Title'
             type: array
+      tags:
+      - Titles
     post:
       parameters:
       - description: Dados da Obra
@@ -261,4 +358,29 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/domain.Title'
+  /titles/{title_id}/contents:
+    post:
+      parameters:
+      - description: ID da Obra
+        in: path
+        name: title_id
+        required: true
+        type: integer
+      - description: Lista de Conteúdos a criar
+        in: body
+        name: request
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/content.createItem'
+          type: array
+      responses:
+        "201":
+          description: Created
+          schema:
+            items:
+              $ref: '#/definitions/domain.Content'
+            type: array
+      tags:
+      - Contents
 swagger: "2.0"

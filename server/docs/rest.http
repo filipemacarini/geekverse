@@ -1,3 +1,5 @@
+### TITLES
+
 GET http://localhost:5000
 
 ###
@@ -19,7 +21,7 @@ POST http://localhost:5000/titles
 Content-Type: application/json
 
 {
-    "name": "Teste",
+    "name": "Teste com contents",
     "synopsis": "Sinópse Teste",
     "cover_url": "http://teste.com/cover.png",
     "banner_url": "http://teste.com/banner.png",
@@ -34,10 +36,80 @@ Content-Type: application/json
 
 ###
 
-PATCH  http://localhost:5000/titles/{{titleId}}
+PATCH http://localhost:5000/titles/{{titleId}}
 Content-Type: application/json
 
 {
-    "age_rating": "16",
-    "publication_year": 2024
+    "age_rating": "18",
+    "publication_year": 2025
 }
+
+###
+
+DELETE http://localhost:5000/titles/{{titleId}}
+
+### CONTENTS
+
+# @name createContents
+POST http://localhost:5000/titles/{{titleId}}/contents
+Content-Type: application/json
+
+[
+  {
+    "title": "Episodio 1: Eu Ja Estou Acostumado",
+    "season": 1,
+    "episode": 1.0,
+    "language": "sub",
+    "source_url": "https://stream-provider.com/ep1.mp4"
+  },
+  {
+    "title": "Episodio 2: Se Eu Tivesse Mais Uma Chance",
+    "season": 1,
+    "episode": 2.0,
+    "language": "sub",
+    "source_url": "https://stream-provider.com/ep2.mp4"
+  }
+]
+
+###
+
+# @name createContents
+POST http://localhost:5000/titles/{{titleId}}/contents
+Content-Type: application/json
+
+[
+  {
+    "title": "Episodio 3: Eu Ja Estou Acostumado",
+    "season": 1,
+    "episode": 3.0,
+    "language": "sub",
+    "source_url": "https://stream-provider.com/ep1.mp4"
+  },
+  {
+    "title": "Episodio 4: Se Eu Tivesse Mais Uma Chance",
+    "season": 1,
+    "episode": 4.0,
+    "language": "sub",
+    "source_url": "https://stream-provider.com/ep2.mp4"
+  }
+]
+
+###
+
+PATCH http://localhost:5000/contents
+Content-Type: application/json
+
+[
+  {
+    "id": 15,
+    "title": "Episodio 1: Versao Estendida"
+  },
+  {
+    "id": 18,
+    "source_url": "https://novo-stream.com/ep2-remasterizado.mp4"
+  }
+]
+
+###
+
+DELETE http://localhost:5000/contents/18

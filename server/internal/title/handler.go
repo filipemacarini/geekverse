@@ -55,6 +55,7 @@ func (h *Handler) Routes() chi.Router {
 	return r
 }
 
+// @Tags Titles
 // @Success 200 {array} domain.Title
 // @Router /titles [get]
 func (h *Handler) List(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {

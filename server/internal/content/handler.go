@@ -53,6 +53,11 @@ func (h *Handler) Routes() chi.Router {
 	return r
 }
 
+// @Tags Contents
+// @Param title_id path int true "ID da Obra"
+// @Param request body []createItem true "Lista de Conteúdos a criar"
+// @Success 201 {array} domain.Content
+// @Router /titles/{title_id}/contents [post]
 func (h *Handler) CreateBatch(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	titleID, err := strconv.Atoi(chi.URLParam(r, "title_id"))
 	if err != nil {
@@ -92,6 +97,10 @@ func (h *Handler) CreateBatch(w http.ResponseWriter, r *http.Request) (interface
 	return contents, http.StatusCreated, nil
 }
 
+// @Tags Contents
+// @Param request body []updateItem true "Lista de Atualizações com IDs"
+// @Success 200 {object} map[string]string
+// @Router /contents [patch]
 func (h *Handler) UpdateBatch(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	var req []updateItem
 	if err := render.DecodeJSON(r.Body, &req); err != nil {
@@ -118,6 +127,10 @@ func (h *Handler) UpdateBatch(w http.ResponseWriter, r *http.Request) (interface
 	return map[string]string{"mensagem": "conteúdos atualizados com sucesso"}, http.StatusOK, nil
 }
 
+// @Tags Contents
+// @Param id path int true "ID do Conteúdo"
+// @Success 200 {object} map[string]string
+// @Router /contents/{id} [delete]
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {

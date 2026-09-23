@@ -15,8 +15,70 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/contents": {
+            "patch": {
+                "tags": [
+                    "Contents"
+                ],
+                "parameters": [
+                    {
+                        "description": "Lista de Atualizações com IDs",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/content.updateItem"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/contents/{id}": {
+            "delete": {
+                "tags": [
+                    "Contents"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID do Conteúdo",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/titles": {
             "get": {
+                "tags": [
+                    "Titles"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -121,9 +183,127 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/titles/{title_id}/contents": {
+            "post": {
+                "tags": [
+                    "Contents"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Obra",
+                        "name": "title_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Lista de Conteúdos a criar",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/content.createItem"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Content"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "content.createItem": {
+            "type": "object",
+            "required": [
+                "language",
+                "source_url",
+                "title"
+            ],
+            "properties": {
+                "cover_url": {
+                    "type": "string",
+                    "example": "https://exemplo.com/capa-vol1.jpg"
+                },
+                "episode": {
+                    "type": "number",
+                    "example": 1
+                },
+                "language": {
+                    "type": "string",
+                    "enum": [
+                        "sub",
+                        "dub",
+                        "none"
+                    ],
+                    "example": "sub"
+                },
+                "season": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "example": 1
+                },
+                "source_url": {
+                    "type": "string",
+                    "example": "https://stream.exemplo.com/ep1.mp4"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 150,
+                    "minLength": 2,
+                    "example": "Episódio 1 - O Despertar"
+                }
+            }
+        },
+        "content.updateItem": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "cover_url": {
+                    "type": "string"
+                },
+                "episode": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "language": {
+                    "type": "string",
+                    "enum": [
+                        "sub",
+                        "dub",
+                        "none"
+                    ]
+                },
+                "season": {
+                    "type": "integer"
+                },
+                "source_url": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 150,
+                    "minLength": 2
+                }
+            }
+        },
         "domain.Content": {
             "type": "object",
             "required": [
