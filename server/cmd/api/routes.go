@@ -5,6 +5,7 @@ import (
 	"geekverse/internal/genre"
 	"geekverse/internal/platform/httperr"
 	"geekverse/internal/platform/storage"
+	"geekverse/internal/profile"
 	"geekverse/internal/title"
 	"net/http"
 
@@ -54,6 +55,10 @@ func setupRoutes(db *gorm.DB, storageClient *storage.Client) *chi.Mux {
 	genreStore := genre.NewStore(db)
 	genreHandler := genre.NewHandler(genreStore)
 	r.Mount("/genres", genreHandler.Routes())
+
+	profileStore := profile.NewStore(db)
+	profileHandler := profile.NewHandler(profileStore)
+	r.Mount("/profiles", profileHandler.Routes())
 
 	return r
 }
