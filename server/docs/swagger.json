@@ -284,6 +284,99 @@
                 }
             }
         },
+        "/profiles/{profile_id}/favorites": {
+            "get": {
+                "tags": [
+                    "Favorites"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID do Perfil",
+                        "name": "profile_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Favorite"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles/{profile_id}/favorites/{title_id}": {
+            "post": {
+                "tags": [
+                    "Favorites"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID do Perfil",
+                        "name": "profile_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID da Obra",
+                        "name": "title_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Favorites"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID do Perfil",
+                        "name": "profile_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "ID da Obra",
+                        "name": "title_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/titles": {
             "get": {
                 "tags": [

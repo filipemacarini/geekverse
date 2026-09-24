@@ -2,6 +2,7 @@ package main
 
 import (
 	"geekverse/internal/content"
+	"geekverse/internal/favorite"
 	"geekverse/internal/genre"
 	"geekverse/internal/platform/httperr"
 	"geekverse/internal/platform/storage"
@@ -59,6 +60,10 @@ func setupRoutes(db *gorm.DB, storageClient *storage.Client) *chi.Mux {
 	profileStore := profile.NewStore(db)
 	profileHandler := profile.NewHandler(profileStore)
 	r.Mount("/profiles", profileHandler.Routes())
+
+	favoriteStore := favorite.NewStore(db)
+	favoriteHandler := favorite.NewHandler(favoriteStore)
+	r.Mount("/profiles/{profile_id}/favorites", favoriteHandler.Routes())
 
 	return r
 }

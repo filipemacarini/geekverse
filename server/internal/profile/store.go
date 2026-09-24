@@ -22,7 +22,7 @@ func (s *Store) FindAll() ([]domain.Profile, error) {
 
 func (s *Store) FindByID(id string) (*domain.Profile, error) {
 	var profile domain.Profile
-	err := s.db.Preload("Arts").Preload("Favorites").First(&profile, "id = ?", id).Error
+	err := s.db.Preload("Arts").First(&profile, "id = ?", id).Error
 	if err != nil {
 		return nil, err
 	}

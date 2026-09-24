@@ -102,7 +102,7 @@ Content-Type: application/json
 
 [
   {
-    "id": 36,
+    "id": 10,
     "source_url": "https://novo-stream.com/ep2-remasterizado.mp4"
   }
 ]
@@ -173,5 +173,17 @@ PATCH http://localhost:5000/profiles/{{profileId}}/role
 Content-Type: application/json
 
 {
-    "role": "moderator"
+    "role": "admin"
 }
+
+### FAVORITES
+
+POST http://localhost:5000/profiles/{{profileId}}/favorites/10
+
+###
+
+GET http://localhost:5000/profiles/{{profileId}}/favorites
+
+###
+
+DELETE http://localhost:5000/profiles/{{profileId}}/favorites/5

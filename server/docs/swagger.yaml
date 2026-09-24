@@ -495,6 +495,66 @@ paths:
             type: object
       tags:
       - Profiles
+  /profiles/{profile_id}/favorites:
+    get:
+      parameters:
+      - description: UUID do Perfil
+        in: path
+        name: profile_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Favorite'
+            type: array
+      tags:
+      - Favorites
+  /profiles/{profile_id}/favorites/{title_id}:
+    delete:
+      parameters:
+      - description: UUID do Perfil
+        in: path
+        name: profile_id
+        required: true
+        type: string
+      - description: ID da Obra
+        in: path
+        name: title_id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      tags:
+      - Favorites
+    post:
+      parameters:
+      - description: UUID do Perfil
+        in: path
+        name: profile_id
+        required: true
+        type: string
+      - description: ID da Obra
+        in: path
+        name: title_id
+        required: true
+        type: integer
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      tags:
+      - Favorites
   /titles:
     get:
       responses:
