@@ -58,6 +58,29 @@ definitions:
     required:
     - id
     type: object
+  domain.Art:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      image_url:
+        type: string
+      likes_count:
+        type: integer
+      profile_id:
+        type: string
+      title:
+        maxLength: 100
+        minLength: 2
+        type: string
+    required:
+    - image_url
+    - profile_id
+    - title
+    type: object
   domain.Content:
     properties:
       cover_url:
@@ -89,6 +112,17 @@ definitions:
     - title
     - title_id
     type: object
+  domain.Favorite:
+    properties:
+      created_at:
+        type: string
+      profile_id:
+        type: string
+      title:
+        $ref: '#/definitions/domain.Title'
+      title_id:
+        type: integer
+    type: object
   domain.Genre:
     properties:
       id:
@@ -103,6 +137,41 @@ definitions:
         type: array
     required:
     - name
+    type: object
+  domain.Profile:
+    properties:
+      arts:
+        items:
+          $ref: '#/definitions/domain.Art'
+        type: array
+      avatar_url:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      favorites:
+        items:
+          $ref: '#/definitions/domain.Favorite'
+        type: array
+      id:
+        type: string
+      role:
+        enum:
+        - user
+        - moderator
+        - content_manager
+        - admin
+        type: string
+      username:
+        maxLength: 50
+        minLength: 4
+        type: string
+    required:
+    - email
+    - id
+    - role
+    - username
     type: object
   domain.Title:
     properties:
@@ -180,6 +249,28 @@ definitions:
     required:
     - id
     - name
+    type: object
+  profile.updateRequest:
+    properties:
+      avatar_url:
+        type: string
+      username:
+        maxLength: 50
+        minLength: 4
+        type: string
+    type: object
+  profile.updateRoleRequest:
+    properties:
+      role:
+        enum:
+        - user
+        - moderator
+        - content_manager
+        - admin
+        example: moderator
+        type: string
+    required:
+    - role
     type: object
   title.createRequest:
     type: object
@@ -333,6 +424,77 @@ paths:
             type: object
       tags:
       - Genres
+  /profiles:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Profile'
+            type: array
+      tags:
+      - Profiles
+  /profiles/{id}:
+    get:
+      parameters:
+      - description: UUID do Perfil
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Profile'
+      tags:
+      - Profiles
+    patch:
+      parameters:
+      - description: UUID do Perfil
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Campos para atualizar
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/profile.updateRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      tags:
+      - Profiles
+  /profiles/{id}/role:
+    patch:
+      parameters:
+      - description: UUID do Perfil
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Novo cargo
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/profile.updateRoleRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      tags:
+      - Profiles
   /titles:
     get:
       responses:

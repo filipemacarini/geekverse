@@ -38,6 +38,9 @@ func (h *Handler) Routes() chi.Router {
 	return r
 }
 
+// @Tags Profiles
+// @Success 200 {array} domain.Profile
+// @Router /profiles [get]
 func (h *Handler) List(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	profiles, err := h.store.FindAll()
 	if err != nil {
@@ -46,6 +49,10 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) (interface{}, int
 	return profiles, http.StatusOK, nil
 }
 
+// @Tags Profiles
+// @Param id path string true "UUID do Perfil"
+// @Success 200 {object} domain.Profile
+// @Router /profiles/{id} [get]
 func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	id := chi.URLParam(r, "id")
 
@@ -59,6 +66,11 @@ func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) (interface{}, 
 	return profile, http.StatusOK, nil
 }
 
+// @Tags Profiles
+// @Param id path string true "UUID do Perfil"
+// @Param request body updateRequest true "Campos para atualizar"
+// @Success 200 {object} map[string]string
+// @Router /profiles/{id} [patch]
 func (h *Handler) Update(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	id := chi.URLParam(r, "id")
 
@@ -85,6 +97,11 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) (interface{}, i
 	return map[string]string{"mensagem": "perfil atualizado com sucesso"}, http.StatusOK, nil
 }
 
+// @Tags Profiles
+// @Param id path string true "UUID do Perfil"
+// @Param request body updateRoleRequest true "Novo cargo"
+// @Success 200 {object} map[string]string
+// @Router /profiles/{id}/role [patch]
 func (h *Handler) UpdateRole(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	id := chi.URLParam(r, "id")
 

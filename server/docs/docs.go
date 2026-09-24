@@ -179,6 +179,118 @@ const docTemplate = `{
                 }
             }
         },
+        "/profiles": {
+            "get": {
+                "tags": [
+                    "Profiles"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Profile"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles/{id}": {
+            "get": {
+                "tags": [
+                    "Profiles"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID do Perfil",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Profile"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Profiles"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID do Perfil",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Campos para atualizar",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/profile.updateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles/{id}/role": {
+            "patch": {
+                "tags": [
+                    "Profiles"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID do Perfil",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Novo cargo",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/profile.updateRoleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/titles": {
             "get": {
                 "tags": [
@@ -455,6 +567,39 @@ const docTemplate = `{
                 }
             }
         },
+        "domain.Art": {
+            "type": "object",
+            "required": [
+                "image_url",
+                "profile_id",
+                "title"
+            ],
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "likes_count": {
+                    "type": "integer"
+                },
+                "profile_id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 2
+                }
+            }
+        },
         "domain.Content": {
             "type": "object",
             "required": [
@@ -498,6 +643,23 @@ const docTemplate = `{
                 }
             }
         },
+        "domain.Favorite": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "profile_id": {
+                    "type": "string"
+                },
+                "title": {
+                    "$ref": "#/definitions/domain.Title"
+                },
+                "title_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "domain.Genre": {
             "type": "object",
             "required": [
@@ -517,6 +679,55 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/domain.Title"
                     }
+                }
+            }
+        },
+        "domain.Profile": {
+            "type": "object",
+            "required": [
+                "email",
+                "id",
+                "role",
+                "username"
+            ],
+            "properties": {
+                "arts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.Art"
+                    }
+                },
+                "avatar_url": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "favorites": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.Favorite"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string",
+                    "enum": [
+                        "user",
+                        "moderator",
+                        "content_manager",
+                        "admin"
+                    ]
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 4
                 }
             }
         },
@@ -623,6 +834,37 @@ const docTemplate = `{
                     "maxLength": 50,
                     "minLength": 2,
                     "example": "Ação"
+                }
+            }
+        },
+        "profile.updateRequest": {
+            "type": "object",
+            "properties": {
+                "avatar_url": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 4
+                }
+            }
+        },
+        "profile.updateRoleRequest": {
+            "type": "object",
+            "required": [
+                "role"
+            ],
+            "properties": {
+                "role": {
+                    "type": "string",
+                    "enum": [
+                        "user",
+                        "moderator",
+                        "content_manager",
+                        "admin"
+                    ],
+                    "example": "moderator"
                 }
             }
         },
