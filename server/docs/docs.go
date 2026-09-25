@@ -15,6 +15,197 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/arts": {
+            "get": {
+                "tags": [
+                    "Arts"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Art"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Arts"
+                ],
+                "parameters": [
+                    {
+                        "description": "Dados da Arte",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/art.createRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Art"
+                        }
+                    }
+                }
+            }
+        },
+        "/arts/{id}": {
+            "get": {
+                "tags": [
+                    "Arts"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Arte",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Art"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Arts"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Arte",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "Arts"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Arte",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Campos para atualizar",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/art.updateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/arts/{id}/likes/{profile_id}": {
+            "post": {
+                "tags": [
+                    "Arts"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Arte",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "UUID do Perfil",
+                        "name": "profile_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Arts"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Arte",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "UUID do Perfil",
+                        "name": "profile_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/contents": {
             "patch": {
                 "tags": [
@@ -581,6 +772,47 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "art.createRequest": {
+            "type": "object",
+            "required": [
+                "image_url",
+                "profile_id",
+                "title"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Deu muito trabalho!"
+                },
+                "image_url": {
+                    "type": "string",
+                    "example": "https://exemplo.com/arte.jpg"
+                },
+                "profile_id": {
+                    "type": "string",
+                    "example": "11111111-1111-1111-1111-111111111111"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 2,
+                    "example": "Fanart do Goku"
+                }
+            }
+        },
+        "art.updateRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 2
+                }
+            }
+        },
         "content.createItem": {
             "type": "object",
             "required": [
@@ -857,11 +1089,20 @@ const docTemplate = `{
                 "cover_url": {
                     "type": "string"
                 },
+                "episode_count": {
+                    "type": "integer"
+                },
                 "genres": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/domain.Genre"
                     }
+                },
+                "has_dub": {
+                    "type": "boolean"
+                },
+                "has_sub": {
+                    "type": "boolean"
                 },
                 "id": {
                     "type": "integer"

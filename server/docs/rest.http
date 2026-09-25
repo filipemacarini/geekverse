@@ -187,3 +187,47 @@ GET http://localhost:5000/profiles/{{profileId}}/favorites
 ###
 
 DELETE http://localhost:5000/profiles/{{profileId}}/favorites/5
+
+### ARTS
+
+# @name createArt
+POST http://localhost:5000/arts
+Content-Type: application/json
+
+{
+    "profile_id": "{{profileId}}",
+    "title": "Minha Primeira Fanart do Goku",
+    "description": "Feito no iPad Pro. Deu muito trabalho!",
+    "image_url": "https://storage.exemplo.com/arts/goku-super.png"
+}
+
+@artId = {{createArt.response.body.id}}
+
+###
+
+GET http://localhost:5000/arts
+
+###
+
+GET http://localhost:5000/arts/{{artId}}
+
+###
+
+PATCH http://localhost:5000/arts/{{artId}}
+Content-Type: application/json
+
+{
+    "description": "Goku SSJ4 (Editado)"
+}
+
+###
+
+POST http://localhost:5000/arts/{{artId}}/likes/{{profileId}}
+
+###
+
+DELETE http://localhost:5000/arts/{{artId}}/likes/{{profileId}}
+
+###
+
+DELETE http://localhost:5000/arts/{{artId}}

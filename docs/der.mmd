@@ -1,11 +1,17 @@
+---
+config:
+  theme: redux-dark-color
+  layout: elk
+---
 erDiagram
-PROFILES ||--o{ ARTS : ""
-PROFILES ||--o{ FAVORITES : ""
-TITLES ||--o{ FAVORITES : ""
-
-TITLES ||--o{ CONTENTS : ""
-TITLES ||--o{ TITLE_GENRES : ""
-GENRES ||--o{ TITLE_GENRES : ""
+PROFILES ||--o{ ARTS : " "
+PROFILES ||--o{ ART_LIKES : " "
+PROFILES ||--o{ FAVORITES : " "
+ARTS ||--o{ ART_LIKES : " "
+TITLES ||--o{ FAVORITES : " "
+TITLES ||--o{ CONTENTS : " "
+TITLES ||--o{ TITLE_GENRES : " "
+GENRES ||--o{ TITLE_GENRES : " "
 
 PROFILES {
     uuid id PK
@@ -57,6 +63,12 @@ ARTS {
     string description
     string image_url
     int likes_count
+    timestamp created_at
+}
+
+ART_LIKES {
+    uuid profile_id PK, FK
+    int art_id PK, FK
     timestamp created_at
 }
 

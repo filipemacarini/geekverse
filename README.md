@@ -28,10 +28,8 @@ Projeto desenvolvido para a **ExpoCEEP 2026** pelo Curso Técnico em Desenvolvim
 
 ## Documentação do Projeto
 
-- [Diagrama Entidade-Relacionamento (DER)](/docs/der.png)
-- [Especificação OpenAPI (Swagger JSON)](server/docs/swagger.json)
-- [Documentação Interativa (Swagger UI)](http://localhost:5000/swagger/index.html): É necessário que o servidor esteja sendo executado localmente
-  
+- [Diagrama Entidade-Relacionamento (DER)](/docs/der.md)
+- [Swagger UI (http://localhost:5000/swagger/index.html)](http://localhost:5000/swagger/index.html)
 ---
 
 ## Equipe e Responsabilidades
