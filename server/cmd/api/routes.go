@@ -1,6 +1,7 @@
 package main
 
 import (
+	"geekverse/internal/art"
 	"geekverse/internal/content"
 	"geekverse/internal/favorite"
 	"geekverse/internal/genre"
@@ -64,6 +65,10 @@ func setupRoutes(db *gorm.DB, storageClient *storage.Client) *chi.Mux {
 	favoriteStore := favorite.NewStore(db)
 	favoriteHandler := favorite.NewHandler(favoriteStore)
 	r.Mount("/profiles/{profile_id}/favorites", favoriteHandler.Routes())
+
+	artStore := art.NewStore(db)
+	artHandler := art.NewHandler(artStore)
+	r.Mount("/arts", artHandler.Routes())
 
 	return r
 }

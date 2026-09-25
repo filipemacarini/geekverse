@@ -14,6 +14,7 @@ func Migrate(db *gorm.DB) error {
 		&domain.Genre{},
 		&domain.TitleGenre{},
 		&domain.Art{},
+		&domain.ArtLike{},
 		&domain.Favorite{},
 	)
 }
