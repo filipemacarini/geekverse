@@ -20,7 +20,12 @@ func (s *Store) Create(title *domain.Title) error {
 
 func (s *Store) FindAll(mediaType string) ([]domain.Title, error) {
 	var titles []domain.Title
-	query := s.db.Model(&domain.Title{}).Preload("Genres")
+	query := s.db.Model(&domain.Title{}).Select(`
+		titles.*,
+		(SELECT COUNT(id) FROM contents WHERE contents.title_id = titles.id) AS episode_count,
+		EXISTS(SELECT 1 FROM contents WHERE contents.title_id = titles.id AND language = 'sub') AS has_sub,
+		EXISTS(SELECT 1 FROM contents WHERE contents.title_id = titles.id AND language = 'dub') AS has_dub
+	`).Preload("Genres")
 
 	if mediaType != "" {
 		query = query.Where("type = ?", mediaType)

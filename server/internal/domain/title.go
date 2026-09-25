@@ -12,6 +12,10 @@ type Title struct {
 	Source          string `json:"source" gorm:"type:text"`
 	PublicationYear int    `json:"publication_year" gorm:"type:smallint;not null" validate:"required"`
 
+	EpisodeCount int  `json:"episode_count" gorm:"->"`
+	HasSub       bool `json:"has_sub" gorm:"->"`
+	HasDub       bool `json:"has_dub" gorm:"->"`
+
 	Contents []Content `json:"contents,omitempty" gorm:"foreignKey:TitleID;constraint:OnDelete:CASCADE"`
 	Genres   []Genre   `json:"genres,omitempty" gorm:"many2many:title_genres;constraint:OnDelete:CASCADE"`
 }
