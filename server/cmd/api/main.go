@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"geekverse/internal/platform/auth"
 	"geekverse/internal/platform/database"
 	"geekverse/internal/platform/storage"
 	"log"
@@ -17,6 +18,9 @@ import (
 // @version 1.0
 // @description API central da plataforma GeekVerse (Streaming, Leitura e Galeria de Artes).
 // @BasePath /
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func main() {
 	_ = godotenv.Load()
 
@@ -43,7 +47,16 @@ func main() {
 		os.Getenv("SUPABASE_KEY"),
 	)
 
-	r := setupRoutes(db, storageClient)
+	authValidator, err := auth.NewValidator(
+		os.Getenv("SUPABASE_URL"),
+		os.Getenv("SUPABASE_KEY"),
+	)
+	if err != nil {
+		log.Fatalf("Falha ao inicializar o validador JWT: %v", err)
+	}
+	fmt.Println("Conexão com JWKS Supabase estabelecida")
+
+	r := setupRoutes(db, storageClient, authValidator)
 
 	port := os.Getenv("PORT")
 	if port == "" {

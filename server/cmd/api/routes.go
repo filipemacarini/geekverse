@@ -5,6 +5,7 @@ import (
 	"geekverse/internal/content"
 	"geekverse/internal/favorite"
 	"geekverse/internal/genre"
+	"geekverse/internal/platform/auth"
 	"geekverse/internal/platform/httperr"
 	"geekverse/internal/platform/storage"
 	"geekverse/internal/profile"
@@ -18,7 +19,11 @@ import (
 	"gorm.io/gorm"
 )
 
-func setupRoutes(db *gorm.DB, storageClient *storage.Client) *chi.Mux {
+func setupRoutes(db *gorm.DB, storageClient *storage.Client, authValidator *auth.Validator) *chi.Mux {
+	requireAuth := auth.RequireAuth(authValidator)
+	requireAdmin := auth.RequireRole(db, "admin")
+	_ = requireAdmin
+
 	r := chi.NewRouter()
 
 	r.Use((middleware.RequestID))
@@ -68,7 +73,7 @@ func setupRoutes(db *gorm.DB, storageClient *storage.Client) *chi.Mux {
 
 	artStore := art.NewStore(db)
 	artHandler := art.NewHandler(artStore)
-	r.Mount("/arts", artHandler.Routes())
+	r.Mount("/arts", artHandler.Routes(requireAuth))
 
 	return r
 }

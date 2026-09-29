@@ -33,6 +33,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Arts"
                 ],
@@ -81,6 +86,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Arts"
                 ],
@@ -106,6 +116,11 @@ const docTemplate = `{
                 }
             },
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Arts"
                 ],
@@ -140,8 +155,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/arts/{id}/likes/{profile_id}": {
+        "/arts/{id}/likes": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Arts"
                 ],
@@ -150,13 +170,6 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "ID da Arte",
                         "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "UUID do Perfil",
-                        "name": "profile_id",
                         "in": "path",
                         "required": true
                     }
@@ -174,6 +187,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Arts"
                 ],
@@ -182,13 +200,6 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "ID da Arte",
                         "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "UUID do Perfil",
-                        "name": "profile_id",
                         "in": "path",
                         "required": true
                     }
@@ -776,7 +787,6 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "image_url",
-                "profile_id",
                 "title"
             ],
             "properties": {
@@ -787,10 +797,6 @@ const docTemplate = `{
                 "image_url": {
                     "type": "string",
                     "example": "https://exemplo.com/arte.jpg"
-                },
-                "profile_id": {
-                    "type": "string",
-                    "example": "11111111-1111-1111-1111-111111111111"
                 },
                 "title": {
                     "type": "string",
@@ -1260,6 +1266,13 @@ const docTemplate = `{
                     ]
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

@@ -8,9 +8,6 @@ definitions:
       image_url:
         example: https://exemplo.com/arte.jpg
         type: string
-      profile_id:
-        example: 11111111-1111-1111-1111-111111111111
-        type: string
       title:
         example: Fanart do Goku
         maxLength: 100
@@ -18,7 +15,6 @@ definitions:
         type: string
     required:
     - image_url
-    - profile_id
     - title
     type: object
   art.updateRequest:
@@ -381,6 +377,8 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/domain.Art'
+      security:
+      - BearerAuth: []
       tags:
       - Arts
   /arts/{id}:
@@ -398,6 +396,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       tags:
       - Arts
     get:
@@ -434,9 +434,11 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       tags:
       - Arts
-  /arts/{id}/likes/{profile_id}:
+  /arts/{id}/likes:
     delete:
       parameters:
       - description: ID da Arte
@@ -444,11 +446,6 @@ paths:
         name: id
         required: true
         type: integer
-      - description: UUID do Perfil
-        in: path
-        name: profile_id
-        required: true
-        type: string
       responses:
         "200":
           description: OK
@@ -456,6 +453,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       tags:
       - Arts
     post:
@@ -465,11 +464,6 @@ paths:
         name: id
         required: true
         type: integer
-      - description: UUID do Perfil
-        in: path
-        name: profile_id
-        required: true
-        type: string
       responses:
         "201":
           description: Created
@@ -477,6 +471,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       tags:
       - Arts
   /contents:
@@ -837,4 +833,9 @@ paths:
             type: object
       tags:
       - Storage
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

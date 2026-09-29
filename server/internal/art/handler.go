@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"geekverse/internal/domain"
+	"geekverse/internal/platform/auth"
 	"geekverse/internal/platform/httperr"
 	"geekverse/internal/platform/validator"
 	"net/http"
@@ -23,7 +24,6 @@ func NewHandler(store *Store) *Handler {
 }
 
 type createRequest struct {
-	ProfileID   string `json:"profile_id" validate:"required" example:"11111111-1111-1111-1111-111111111111"`
 	Title       string `json:"title" validate:"required,min=2,max=100" example:"Fanart do Goku"`
 	Description string `json:"description" example:"Deu muito trabalho!"`
 	ImageURL    string `json:"image_url" validate:"required,url" example:"https://exemplo.com/arte.jpg"`
@@ -34,16 +34,22 @@ type updateRequest struct {
 	Description *string `json:"description,omitempty"`
 }
 
-func (h *Handler) Routes() chi.Router {
+func (h *Handler) Routes(requireAuth func(http.Handler) http.Handler) chi.Router {
 	r := chi.NewRouter()
+
 	r.Get("/", httperr.Wrap(h.List))
 	r.Get("/{id}", httperr.Wrap(h.GetByID))
-	r.Post("/", httperr.Wrap(h.Create))
-	r.Patch("/{id}", httperr.Wrap(h.Update))
-	r.Delete("/{id}", httperr.Wrap(h.Delete))
 
-	r.Post("/{id}/likes/{profile_id}", httperr.Wrap(h.AddLike))
-	r.Delete("/{id}/likes/{profile_id}", httperr.Wrap(h.RemoveLike))
+	r.Group(func(protected chi.Router) {
+		protected.Use(requireAuth)
+
+		protected.Post("/", httperr.Wrap(h.Create))
+		protected.Patch("/{id}", httperr.Wrap(h.Update))
+		protected.Delete("/{id}", httperr.Wrap(h.Delete))
+
+		protected.Post("/{id}/likes/", httperr.Wrap(h.AddLike))
+		protected.Delete("/{id}/likes/", httperr.Wrap(h.RemoveLike))
+	})
 
 	return r
 }
@@ -80,6 +86,7 @@ func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) (interface{}, 
 }
 
 // @Tags Arts
+// @Security BearerAuth
 // @Param request body createRequest true "Dados da Arte"
 // @Success 201 {object} domain.Art
 // @Router /arts [post]
@@ -93,7 +100,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) (interface{}, i
 	}
 
 	newArt := domain.Art{
-		ProfileID:   req.ProfileID,
+		ProfileID:   auth.GetProfileID(r.Context()),
 		Title:       req.Title,
 		Description: req.Description,
 		ImageURL:    req.ImageURL,
@@ -110,6 +117,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) (interface{}, i
 }
 
 // @Tags Arts
+// @Security BearerAuth
 // @Param id path int true "ID da Arte"
 // @Param request body updateRequest true "Campos para atualizar"
 // @Success 200 {object} map[string]string
@@ -142,6 +150,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) (interface{}, i
 }
 
 // @Tags Arts
+// @Security BearerAuth
 // @Param id path int true "ID da Arte"
 // @Success 200 {object} map[string]string
 // @Router /arts/{id} [delete]
@@ -161,16 +170,16 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) (interface{}, i
 }
 
 // @Tags Arts
+// @Security BearerAuth
 // @Param id path int true "ID da Arte"
-// @Param profile_id path string true "UUID do Perfil"
 // @Success 201 {object} map[string]string
-// @Router /arts/{id}/likes/{profile_id} [post]
+// @Router /arts/{id}/likes [post]
 func (h *Handler) AddLike(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		return nil, http.StatusBadRequest, errors.New("id inválido")
 	}
-	profileID := chi.URLParam(r, "profile_id")
+	profileID := auth.GetProfileID(r.Context())
 
 	if err := h.store.AddLike(profileID, uint(id)); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -182,16 +191,16 @@ func (h *Handler) AddLike(w http.ResponseWriter, r *http.Request) (interface{}, 
 }
 
 // @Tags Arts
+// @Security BearerAuth
 // @Param id path int true "ID da Arte"
-// @Param profile_id path string true "UUID do Perfil"
 // @Success 200 {object} map[string]string
-// @Router /arts/{id}/likes/{profile_id} [delete]
+// @Router /arts/{id}/likes [delete]
 func (h *Handler) RemoveLike(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		return nil, http.StatusBadRequest, errors.New("id inválido")
 	}
-	profileID := chi.URLParam(r, "profile_id")
+	profileID := auth.GetProfileID(r.Context())
 
 	if err := h.store.RemoveLike(profileID, uint(id)); err != nil {
 		return nil, http.StatusInternalServerError, httperr.ErrInternal
