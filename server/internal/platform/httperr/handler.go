@@ -21,6 +21,8 @@ func Wrap(fn EndpointFunc) http.HandlerFunc {
 				render.Status(r, http.StatusInternalServerError)
 			} else if errors.Is(err, gorm.ErrRecordNotFound) {
 				render.Status(r, http.StatusNotFound)
+			} else if status != 0 && status != http.StatusOK {
+				render.Status(r, status)
 			} else {
 				render.Status(r, http.StatusBadRequest)
 			}
