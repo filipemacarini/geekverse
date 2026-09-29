@@ -20,26 +20,46 @@ func NewHandler(client *Client) *Handler {
 	return &Handler{client: client}
 }
 
-func (h *Handler) Routes() chi.Router {
+func (h *Handler) Routes(requireAuth, requireStaff func(http.Handler) http.Handler) chi.Router {
 	r := chi.NewRouter()
-	r.Post("/{bucket}", httperr.Wrap(h.UploadFile))
+
+	r.Group(func(users chi.Router) {
+		users.Use(requireAuth)
+		users.Post("/arts", httperr.Wrap(h.UploadArt))
+	})
+
+	r.Group(func(staff chi.Router) {
+		staff.Use(requireAuth)
+		staff.Use(requireStaff)
+		staff.Post("/novels", httperr.Wrap(h.UploadNovel))
+	})
+
 	return r
 }
 
-// UploadFile godoc
 // @Tags Storage
-// @Param bucket path string true "Nome do Balde (novels ou arts)"
-// @Param file formData file true "Arquivo a enviar"
+// @Security BearerAuth
+// @Param file formData file true "Imagem da Arte"
 // @Success 201 {object} map[string]string
-// @Router /upload/{bucket} [post]
-func (h *Handler) UploadFile(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
-	bucket := chi.URLParam(r, "bucket")
+// @Router /upload/arts [post]
+func (h *Handler) UploadArt(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
+	validExts := map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".webp": true, ".gif": true}
+	return h.handleUpload(w, r, "arts", validExts)
+}
 
-	if bucket != "novels" && bucket != "arts" {
-		return nil, http.StatusBadRequest, errors.New("bucket deve ser um dos seguintes valores: novels arts")
-	}
+// @Tags Storage
+// @Security BearerAuth
+// @Param file formData file true "Arquivo da Novel (PDF/EPUB)"
+// @Success 201 {object} map[string]string
+// @Router /upload/novels [post]
+func (h *Handler) UploadNovel(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
+	validExts := map[string]bool{".pdf": true, ".epub": true}
+	return h.handleUpload(w, r, "novels", validExts)
+}
 
-	maxSize := int64(25 << 20)
+// Função privada com a lógica central reaproveitada
+func (h *Handler) handleUpload(w http.ResponseWriter, r *http.Request, bucket string, validExts map[string]bool) (interface{}, int, error) {
+	maxSize := int64(25 << 20) // 25 MB
 	if err := r.ParseMultipartForm(maxSize); err != nil {
 		return nil, http.StatusBadRequest, errors.New("o arquivo excede o limite máximo permitido de 25MB")
 	}
@@ -53,16 +73,8 @@ func (h *Handler) UploadFile(w http.ResponseWriter, r *http.Request) (interface{
 	contentType := header.Header.Get("Content-Type")
 	ext := strings.ToLower(filepath.Ext(header.Filename))
 
-	if bucket == "arts" {
-		validImages := map[string]bool{".jpg": true, ".jpeg": true, ".png": true, ".webp": true, ".gif": true}
-		if !validImages[ext] {
-			return nil, http.StatusBadRequest, errors.New("extensão deve ser um dos seguintes valores: .jpg .jpeg .png .webp .gif")
-		}
-	} else if bucket == "novels" {
-		validDocs := map[string]bool{".pdf": true, ".epub": true}
-		if !validDocs[ext] {
-			return nil, http.StatusBadRequest, errors.New("extensão deve ser um dos seguintes valores: .pdf .epub")
-		}
+	if !validExts[ext] {
+		return nil, http.StatusBadRequest, fmt.Errorf("extensão inválida para o bucket %s", bucket)
 	}
 
 	safeFilename := fmt.Sprintf("%d%s", time.Now().UnixNano(), ext)

@@ -22,6 +22,7 @@ import (
 func setupRoutes(db *gorm.DB, storageClient *storage.Client, authValidator *auth.Validator) *chi.Mux {
 	requireAuth := auth.RequireAuth(authValidator)
 	requireAdmin := auth.RequireRole(db, "admin")
+	requireStaff := auth.RequireRole(db, "admin", "content_manager")
 	_ = requireAdmin
 
 	r := chi.NewRouter()
@@ -57,7 +58,7 @@ func setupRoutes(db *gorm.DB, storageClient *storage.Client, authValidator *auth
 	r.Mount("/contents", contentHandler.Routes())
 
 	storageHandler := storage.NewHandler(storageClient)
-	r.Mount("/upload", storageHandler.Routes())
+	r.Mount("/upload", storageHandler.Routes(requireAuth, requireStaff))
 
 	genreStore := genre.NewStore(db)
 	genreHandler := genre.NewHandler(genreStore)
