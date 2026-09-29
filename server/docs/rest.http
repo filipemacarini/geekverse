@@ -154,6 +154,7 @@ DELETE http://localhost:5000/genres/5
 @profileId = 11111111-1111-1111-1111-111111111111
 
 GET http://localhost:5000/profiles
+Authorization: Bearer {{authToken}}
 
 ### 
 
@@ -164,20 +165,7 @@ apikey: {{$dotenv SUPABASE_KEY}}
 Content-Type: application/json
 
 {
-    "email": "dev_gv@teste.com",
-    "password": "senha123456"
-}
-
-### 
-
-# Sign Up 
-# @name signup
-POST {{$dotenv SUPABASE_URL}}/auth/v1/signup
-apikey: {{$dotenv SUPABASE_KEY}}
-Content-Type: application/json
-
-{
-    "email": "dev_gv2@teste.com",
+    "email": "dev_gv4@teste.com",
     "password": "senha123456"
 }
 
@@ -190,9 +178,26 @@ apikey: {{$dotenv SUPABASE_KEY}}
 Content-Type: application/json
 
 {
-    "email": "dev_gv@teste.com",
+    "email": "dev_gv4@teste.com",
     "password": "senha123456"
 }
+
+###
+
+# Token JWT
+# @name login
+POST {{$dotenv SUPABASE_URL}}/auth/v1/token?grant_type=password
+apikey: {{$dotenv SUPABASE_KEY}}
+Content-Type: application/json
+
+{
+    "email": "dev_gv2@teste.com",
+    "password": "senha123456"
+}
+
+###
+
+@authToken = {{login.response.body.access_token}}
 
 ###
 
@@ -200,18 +205,24 @@ GET http://localhost:5000/profiles/{{profileId}}
 
 ###
 
-PATCH http://localhost:5000/profiles/{{profileId}}
+GET http://localhost:5000/profiles/me
+Authorization: Bearer {{authToken}}
+
+###
+
+PATCH http://localhost:5000/profiles/me
 Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
 {
-    "username": "filipe_dev",
-    "avatar_url": "https://exemplo.com/avatar.png"
+    "avatar_url": "https://teste3.com"
 }
 
 ###
 
 PATCH http://localhost:5000/profiles/{{profileId}}/role
 Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
 {
     "role": "admin"
@@ -234,7 +245,7 @@ DELETE http://localhost:5000/profiles/{{profileId}}/favorites/5
 # @name createArt
 POST http://localhost:5000/arts
 Content-Type: application/json
-Authorization: Bearer {{$dotenv TEST_TOKEN}}
+Authorization: Bearer {{authToken}}
 
 {
     "title": "Minha Primeira Fanart do Goku",
@@ -255,21 +266,24 @@ GET http://localhost:5000/arts/{{artId}}
 ###
 
 PATCH http://localhost:5000/arts/{{artId}}
+Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 {
-    "description": "Goku SSJ4 (Editado)"
+    "description": "Goku SSJ4 (Moderado por violar termos)"
 }
 
 ###
 
 POST http://localhost:5000/arts/{{artId}}/likes/
+Authorization: Bearer {{authToken}}
 
 ###
 
 DELETE http://localhost:5000/arts/{{artId}}/likes/
+Authorization: Bearer {{authToken}}
 
 ###
 
 DELETE http://localhost:5000/arts/{{artId}}
-Authorization: Bearer {{$dotenv TEST_TOKEN}}
+Authorization: Bearer {{authToken}}

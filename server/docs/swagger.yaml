@@ -1,5 +1,31 @@
 basePath: /
 definitions:
+  art.artResponse:
+    properties:
+      author:
+        $ref: '#/definitions/art.authorResponse'
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      image_url:
+        type: string
+      likes_count:
+        type: integer
+      title:
+        type: string
+    type: object
+  art.authorResponse:
+    properties:
+      avatar_url:
+        type: string
+      id:
+        type: string
+      username:
+        type: string
+    type: object
   art.createRequest:
     properties:
       description:
@@ -96,6 +122,8 @@ definitions:
         type: string
       likes_count:
         type: integer
+      profile:
+        $ref: '#/definitions/domain.Profile'
       profile_id:
         type: string
       title:
@@ -360,7 +388,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/domain.Art'
+              $ref: '#/definitions/art.artResponse'
             type: array
       tags:
       - Arts
@@ -376,7 +404,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/domain.Art'
+            $ref: '#/definitions/art.artResponse'
       security:
       - BearerAuth: []
       tags:
@@ -411,7 +439,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/domain.Art'
+            $ref: '#/definitions/art.artResponse'
       tags:
       - Arts
     patch:
@@ -587,6 +615,8 @@ paths:
             items:
               $ref: '#/definitions/domain.Profile'
             type: array
+      security:
+      - BearerAuth: []
       tags:
       - Profiles
   /profiles/{id}:
@@ -602,28 +632,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/domain.Profile'
-      tags:
-      - Profiles
-    patch:
-      parameters:
-      - description: UUID do Perfil
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: Campos para atualizar
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/profile.updateRequest'
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
       tags:
       - Profiles
   /profiles/{id}/role:
@@ -647,6 +655,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       tags:
       - Profiles
   /profiles/{profile_id}/favorites:
@@ -709,6 +719,36 @@ paths:
             type: object
       tags:
       - Favorites
+  /profiles/me:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Profile'
+      security:
+      - BearerAuth: []
+      tags:
+      - Profiles
+    patch:
+      parameters:
+      - description: Campos para atualizar
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/profile.updateRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - Profiles
   /titles:
     get:
       responses:
@@ -811,15 +851,10 @@ paths:
             type: array
       tags:
       - Contents
-  /upload/{bucket}:
+  /upload/arts:
     post:
       parameters:
-      - description: Nome do Balde (novels ou arts)
-        in: path
-        name: bucket
-        required: true
-        type: string
-      - description: Arquivo a enviar
+      - description: Imagem da Arte
         in: formData
         name: file
         required: true
@@ -831,6 +866,27 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - Storage
+  /upload/novels:
+    post:
+      parameters:
+      - description: Arquivo da Novel (PDF/EPUB)
+        in: formData
+        name: file
+        required: true
+        type: file
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
       tags:
       - Storage
 securityDefinitions:

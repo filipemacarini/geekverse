@@ -26,7 +26,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/domain.Art"
+                                "$ref": "#/definitions/art.artResponse"
                             }
                         }
                     }
@@ -56,7 +56,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/domain.Art"
+                            "$ref": "#/definitions/art.artResponse"
                         }
                     }
                 }
@@ -80,7 +80,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/domain.Art"
+                            "$ref": "#/definitions/art.artResponse"
                         }
                     }
                 }
@@ -383,6 +383,11 @@ const docTemplate = `{
         },
         "/profiles": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Profiles"
                 ],
@@ -393,6 +398,58 @@ const docTemplate = `{
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/domain.Profile"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/profiles/me": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "Profiles"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Profile"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "Profiles"
+                ],
+                "parameters": [
+                    {
+                        "description": "Campos para atualizar",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/profile.updateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
                             }
                         }
                     }
@@ -421,44 +478,15 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "patch": {
-                "tags": [
-                    "Profiles"
-                ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "UUID do Perfil",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Campos para atualizar",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/profile.updateRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
             }
         },
         "/profiles/{id}/role": {
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Profiles"
                 ],
@@ -747,22 +775,52 @@ const docTemplate = `{
                 }
             }
         },
-        "/upload/{bucket}": {
+        "/upload/arts": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Storage"
                 ],
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Nome do Balde (novels ou arts)",
-                        "name": "bucket",
-                        "in": "path",
+                        "type": "file",
+                        "description": "Imagem da Arte",
+                        "name": "file",
+                        "in": "formData",
                         "required": true
-                    },
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/upload/novels": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "Storage"
+                ],
+                "parameters": [
                     {
                         "type": "file",
-                        "description": "Arquivo a enviar",
+                        "description": "Arquivo da Novel (PDF/EPUB)",
                         "name": "file",
                         "in": "formData",
                         "required": true
@@ -783,6 +841,46 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "art.artResponse": {
+            "type": "object",
+            "properties": {
+                "author": {
+                    "$ref": "#/definitions/art.authorResponse"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "likes_count": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "art.authorResponse": {
+            "type": "object",
+            "properties": {
+                "avatar_url": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "art.createRequest": {
             "type": "object",
             "required": [
@@ -920,6 +1018,9 @@ const docTemplate = `{
                 },
                 "likes_count": {
                     "type": "integer"
+                },
+                "profile": {
+                    "$ref": "#/definitions/domain.Profile"
                 },
                 "profile_id": {
                     "type": "string"
