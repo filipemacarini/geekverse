@@ -10,4 +10,6 @@ type Art struct {
 	ImageURL    string    `json:"image_url" gorm:"type:text;not null" validate:"required,url"`
 	LikesCount  int       `json:"likes_count" gorm:"default:0"`
 	CreatedAt   time.Time `json:"created_at" gorm:"autoCreateTime"`
+
+	Profile Profile `json:"profile,omitempty"`
 }

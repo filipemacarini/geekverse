@@ -17,13 +17,13 @@ func NewStore(db *gorm.DB) *Store {
 
 func (s *Store) FindAll() ([]domain.Art, error) {
 	var arts []domain.Art
-	err := s.db.Order("created_at DESC").Find(&arts).Error
+	err := s.db.Preload("Profile").Order("created_at DESC").Find(&arts).Error
 	return arts, err
 }
 
 func (s *Store) FindByID(id uint) (*domain.Art, error) {
 	var art domain.Art
-	err := s.db.First(&art, id).Error
+	err := s.db.Preload("Profile").First(&art, id).Error
 	if err != nil {
 		return nil, err
 	}

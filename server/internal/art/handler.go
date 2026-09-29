@@ -9,6 +9,7 @@ import (
 	"geekverse/internal/platform/validator"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
@@ -34,6 +35,60 @@ type updateRequest struct {
 	Description *string `json:"description,omitempty"`
 }
 
+type authorResponse struct {
+	ID        string `json:"id"`
+	Username  string `json:"username"`
+	AvatarURL string `json:"avatar_url"`
+}
+
+type artResponse struct {
+	ID          uint           `json:"id"`
+	Title       string         `json:"title"`
+	Description string         `json:"description"`
+	ImageURL    string         `json:"image_url"`
+	LikesCount  int            `json:"likes_count"`
+	CreatedAt   time.Time      `json:"created_at"`
+	Author      authorResponse `json:"author"`
+}
+
+func mapArtToResponse(art *domain.Art) *artResponse {
+	return &artResponse{
+		ID:          art.ID,
+		Title:       art.Title,
+		Description: art.Description,
+		ImageURL:    art.ImageURL,
+		LikesCount:  art.LikesCount,
+		CreatedAt:   art.CreatedAt,
+		Author: authorResponse{
+			ID:        art.Profile.ID,
+			Username:  art.Profile.Username,
+			AvatarURL: art.Profile.AvatarURL,
+		},
+	}
+}
+
+func (h *Handler) authorizeMutation(r *http.Request, id uint) (*domain.Art, int, error) {
+	art, err := h.store.FindByID(id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, http.StatusNotFound, errors.New("arte não encontrada")
+		}
+		return nil, http.StatusInternalServerError, httperr.ErrInternal
+	}
+
+	callerID := auth.GetProfileID(r.Context())
+	callerRole := auth.GetRole(r.Context())
+
+	isOwner := art.ProfileID == callerID
+	isStaff := callerRole == "admin" || callerRole == "moderator"
+
+	if !isOwner && !isStaff {
+		return nil, http.StatusForbidden, errors.New("você não tem permissão para alterar esta arte")
+	}
+
+	return art, http.StatusOK, nil
+}
+
 func (h *Handler) Routes(requireAuth func(http.Handler) http.Handler) chi.Router {
 	r := chi.NewRouter()
 
@@ -55,19 +110,24 @@ func (h *Handler) Routes(requireAuth func(http.Handler) http.Handler) chi.Router
 }
 
 // @Tags Arts
-// @Success 200 {array} domain.Art
+// @Success 200 {array} artResponse
 // @Router /arts [get]
 func (h *Handler) List(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	arts, err := h.store.FindAll()
 	if err != nil {
 		return nil, http.StatusInternalServerError, httperr.ErrInternal
 	}
-	return arts, http.StatusOK, nil
+
+	var response []artResponse
+	for _, a := range arts {
+		response = append(response, *mapArtToResponse(&a))
+	}
+	return response, http.StatusOK, nil
 }
 
 // @Tags Arts
 // @Param id path int true "ID da Arte"
-// @Success 200 {object} domain.Art
+// @Success 200 {object} artResponse
 // @Router /arts/{id} [get]
 func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
@@ -82,13 +142,13 @@ func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) (interface{}, 
 		}
 		return nil, http.StatusInternalServerError, httperr.ErrInternal
 	}
-	return art, http.StatusOK, nil
+	return mapArtToResponse(art), http.StatusOK, nil
 }
 
 // @Tags Arts
 // @Security BearerAuth
 // @Param request body createRequest true "Dados da Arte"
-// @Success 201 {object} domain.Art
+// @Success 201 {object} artResponse
 // @Router /arts [post]
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	var req createRequest
@@ -99,21 +159,26 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) (interface{}, i
 		return nil, http.StatusBadRequest, err
 	}
 
-	newArt := domain.Art{
+	newArt := &domain.Art{
 		ProfileID:   auth.GetProfileID(r.Context()),
 		Title:       req.Title,
 		Description: req.Description,
 		ImageURL:    req.ImageURL,
 	}
 
-	if err := h.store.Create(&newArt); err != nil {
+	if err := h.store.Create(newArt); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, http.StatusNotFound, errors.New("perfil do autor não encontrado")
 		}
 		return nil, http.StatusInternalServerError, httperr.ErrInternal
 	}
 
-	return &newArt, http.StatusCreated, nil
+	createdArt, err := h.store.FindByID(newArt.ID)
+	if err != nil {
+		return nil, http.StatusInternalServerError, httperr.ErrInternal
+	}
+
+	return mapArtToResponse(createdArt), http.StatusCreated, nil
 }
 
 // @Tags Arts
@@ -136,7 +201,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) (interface{}, i
 		return nil, http.StatusBadRequest, err
 	}
 
-	if _, status, err := h.findOwnedArt(r, uint(id)); err != nil {
+	if _, status, err := h.authorizeMutation(r, uint(id)); err != nil {
 		return nil, status, err
 	}
 
@@ -164,7 +229,7 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) (interface{}, i
 		return nil, http.StatusBadRequest, errors.New("id inválido")
 	}
 
-	if _, status, err := h.findOwnedArt(r, uint(id)); err != nil {
+	if _, status, err := h.authorizeMutation(r, uint(id)); err != nil {
 		return nil, status, err
 	}
 
@@ -214,21 +279,4 @@ func (h *Handler) RemoveLike(w http.ResponseWriter, r *http.Request) (interface{
 		return nil, http.StatusInternalServerError, httperr.ErrInternal
 	}
 	return map[string]string{"mensagem": "curtida removida"}, http.StatusOK, nil
-}
-
-func (h *Handler) findOwnedArt(r *http.Request, id uint) (*domain.Art, int, error) {
-	art, err := h.store.FindByID(id)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, http.StatusNotFound, errors.New("arte não encontrada")
-		}
-		return nil, http.StatusInternalServerError, httperr.ErrInternal
-	}
-
-	callerID := auth.GetProfileID(r.Context())
-	if art.ProfileID != callerID {
-		return nil, http.StatusForbidden, errors.New("você não tem permissão para alterar esta arte")
-	}
-
-	return art, http.StatusOK, nil
 }
