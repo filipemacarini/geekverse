@@ -136,6 +136,10 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) (interface{}, i
 		return nil, http.StatusBadRequest, err
 	}
 
+	if _, status, err := h.findOwnedArt(r, uint(id)); err != nil {
+		return nil, status, err
+	}
+
 	var updates map[string]interface{}
 	data, _ := json.Marshal(req)
 	_ = json.Unmarshal(data, &updates)
@@ -158,6 +162,10 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) (interface{}, i
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		return nil, http.StatusBadRequest, errors.New("id inválido")
+	}
+
+	if _, status, err := h.findOwnedArt(r, uint(id)); err != nil {
+		return nil, status, err
 	}
 
 	if err := h.store.Delete(uint(id)); err != nil {
@@ -206,4 +214,21 @@ func (h *Handler) RemoveLike(w http.ResponseWriter, r *http.Request) (interface{
 		return nil, http.StatusInternalServerError, httperr.ErrInternal
 	}
 	return map[string]string{"mensagem": "curtida removida"}, http.StatusOK, nil
+}
+
+func (h *Handler) findOwnedArt(r *http.Request, id uint) (*domain.Art, int, error) {
+	art, err := h.store.FindByID(id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, http.StatusNotFound, errors.New("arte não encontrada")
+		}
+		return nil, http.StatusInternalServerError, httperr.ErrInternal
+	}
+
+	callerID := auth.GetProfileID(r.Context())
+	if art.ProfileID != callerID {
+		return nil, http.StatusForbidden, errors.New("você não tem permissão para alterar esta arte")
+	}
+
+	return art, http.StatusOK, nil
 }

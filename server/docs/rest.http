@@ -155,6 +155,45 @@ DELETE http://localhost:5000/genres/5
 
 GET http://localhost:5000/profiles
 
+### 
+
+# Sign Up
+# @name signup
+POST {{$dotenv SUPABASE_URL}}/auth/v1/signup
+apikey: {{$dotenv SUPABASE_KEY}}
+Content-Type: application/json
+
+{
+    "email": "dev_gv@teste.com",
+    "password": "senha123456"
+}
+
+### 
+
+# Sign Up 
+# @name signup
+POST {{$dotenv SUPABASE_URL}}/auth/v1/signup
+apikey: {{$dotenv SUPABASE_KEY}}
+Content-Type: application/json
+
+{
+    "email": "dev_gv2@teste.com",
+    "password": "senha123456"
+}
+
+###
+
+# Token JWT
+# @name login
+POST {{$dotenv SUPABASE_URL}}/auth/v1/token?grant_type=password
+apikey: {{$dotenv SUPABASE_KEY}}
+Content-Type: application/json
+
+{
+    "email": "dev_gv@teste.com",
+    "password": "senha123456"
+}
+
 ###
 
 GET http://localhost:5000/profiles/{{profileId}}
@@ -195,9 +234,9 @@ DELETE http://localhost:5000/profiles/{{profileId}}/favorites/5
 # @name createArt
 POST http://localhost:5000/arts
 Content-Type: application/json
+Authorization: Bearer {{$dotenv TEST_TOKEN}}
 
 {
-    "profile_id": "{{profileId}}",
     "title": "Minha Primeira Fanart do Goku",
     "description": "Feito no iPad Pro. Deu muito trabalho!",
     "image_url": "https://storage.exemplo.com/arts/goku-super.png"
@@ -233,3 +272,4 @@ DELETE http://localhost:5000/arts/{{artId}}/likes/
 ###
 
 DELETE http://localhost:5000/arts/{{artId}}
+Authorization: Bearer {{$dotenv TEST_TOKEN}}
