@@ -20,10 +20,9 @@ import (
 )
 
 func setupRoutes(db *gorm.DB, storageClient *storage.Client, authValidator *auth.Validator) *chi.Mux {
-	requireAuth := auth.RequireAuth(authValidator)
-	requireAdmin := auth.RequireRole(db, "admin")
-	requireStaff := auth.RequireRole(db, "admin", "content_manager")
-	_ = requireAdmin
+	requireAuth := auth.RequireAuth(db, authValidator)
+	requireAdmin := auth.RequireRole("admin")
+	requireContentStaff := auth.RequireRole("admin", "content_manager")
 
 	r := chi.NewRouter()
 
@@ -58,7 +57,7 @@ func setupRoutes(db *gorm.DB, storageClient *storage.Client, authValidator *auth
 	r.Mount("/contents", contentHandler.Routes())
 
 	storageHandler := storage.NewHandler(storageClient)
-	r.Mount("/upload", storageHandler.Routes(requireAuth, requireStaff))
+	r.Mount("/upload", storageHandler.Routes(requireAuth, requireContentStaff))
 
 	genreStore := genre.NewStore(db)
 	genreHandler := genre.NewHandler(genreStore)
@@ -66,7 +65,7 @@ func setupRoutes(db *gorm.DB, storageClient *storage.Client, authValidator *auth
 
 	profileStore := profile.NewStore(db)
 	profileHandler := profile.NewHandler(profileStore)
-	r.Mount("/profiles", profileHandler.Routes())
+	r.Mount("/profiles", profileHandler.Routes(requireAuth, requireAdmin))
 
 	favoriteStore := favorite.NewStore(db)
 	favoriteHandler := favorite.NewHandler(favoriteStore)
