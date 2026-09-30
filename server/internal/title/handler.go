@@ -50,13 +50,21 @@ type updateRequest struct {
 	GenreIDs []uint `json:"genre_ids,omitempty"`
 }
 
-func (h *Handler) Routes() chi.Router {
+func (h *Handler) Routes(requireAuth, requireContentStaff func(http.Handler) http.Handler) chi.Router {
 	r := chi.NewRouter()
+
 	r.Get("/", httperr.Wrap(h.List))
 	r.Get("/{id}", httperr.Wrap(h.GetByID))
-	r.Post("/", httperr.Wrap(h.Create))
-	r.Patch("/{id}", httperr.Wrap(h.Update))
-	r.Delete("/{id}", httperr.Wrap(h.Delete))
+
+	r.Group(func(staff chi.Router) {
+		staff.Use(requireAuth)
+		staff.Use(requireContentStaff)
+
+		staff.Post("/", httperr.Wrap(h.Create))
+		staff.Patch("/{id}", httperr.Wrap(h.Update))
+		staff.Delete("/{id}", httperr.Wrap(h.Delete))
+	})
+
 	return r
 }
 
@@ -93,6 +101,7 @@ func (h *Handler) GetByID(w http.ResponseWriter, r *http.Request) (interface{}, 
 }
 
 // @Tags Titles
+// @Security BearerAuth
 // @Param request body createRequest true "Dados da Obra"
 // @Success 201 {object} domain.Title
 // @Router /titles [post]
@@ -132,6 +141,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) (interface{}, i
 }
 
 // @Tags Titles
+// @Security BearerAuth
 // @Param id path int true "ID da Obra"
 // @Param request body updateRequest true "Campos para atualizar"
 // @Success 200 {object} domain.Title
@@ -173,6 +183,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) (interface{}, i
 }
 
 // @Tags Titles
+// @Security BearerAuth
 // @Param id path int true "ID da Obra"
 // @Success 200 {object} map[string]string
 // @Router /titles/{id} [delete]

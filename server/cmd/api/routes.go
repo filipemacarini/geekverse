@@ -49,19 +49,19 @@ func setupRoutes(db *gorm.DB, storageClient *storage.Client, authValidator *auth
 
 	titleStore := title.NewStore(db)
 	titleHandler := title.NewHandler(titleStore)
-	r.Mount("/titles", titleHandler.Routes())
+	r.Mount("/titles", titleHandler.Routes(requireAuth, requireContentStaff))
 
 	contentStore := content.NewStore(db)
 	contentHandler := content.NewHandler(contentStore)
-	r.Mount("/titles/{title_id}/contents", contentHandler.TitleRoutes())
-	r.Mount("/contents", contentHandler.Routes())
+	r.Mount("/titles/{title_id}/contents", contentHandler.TitleRoutes(requireAuth, requireContentStaff))
+	r.Mount("/contents", contentHandler.Routes(requireAuth, requireContentStaff))
 
 	storageHandler := storage.NewHandler(storageClient)
 	r.Mount("/upload", storageHandler.Routes(requireAuth, requireContentStaff))
 
 	genreStore := genre.NewStore(db)
 	genreHandler := genre.NewHandler(genreStore)
-	r.Mount("/genres", genreHandler.Routes())
+	r.Mount("/genres", genreHandler.Routes(requireAuth, requireContentStaff))
 
 	profileStore := profile.NewStore(db)
 	profileHandler := profile.NewHandler(profileStore)

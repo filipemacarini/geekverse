@@ -40,20 +40,31 @@ type updateItem struct {
 	CoverURL  *string  `json:"cover_url" validate:"omitempty,url"`
 }
 
-func (h *Handler) TitleRoutes() chi.Router {
+func (h *Handler) TitleRoutes(requireAuth, requireContentStaff func(http.Handler) http.Handler) chi.Router {
 	r := chi.NewRouter()
+
+	r.Use(requireAuth)
+	r.Use(requireContentStaff)
+
 	r.Post("/", httperr.Wrap(h.CreateBatch))
+
 	return r
 }
 
-func (h *Handler) Routes() chi.Router {
+func (h *Handler) Routes(requireAuth, requireContentStaff func(http.Handler) http.Handler) chi.Router {
 	r := chi.NewRouter()
+
+	r.Use(requireAuth)
+	r.Use(requireContentStaff)
+
 	r.Patch("/", httperr.Wrap(h.UpdateBatch))
 	r.Delete("/{id}", httperr.Wrap(h.Delete))
+
 	return r
 }
 
 // @Tags Contents
+// @Security BearerAuth
 // @Param title_id path int true "ID da Obra"
 // @Param request body []createItem true "Lista de Conteúdos a criar"
 // @Success 201 {array} domain.Content
@@ -101,6 +112,7 @@ func (h *Handler) CreateBatch(w http.ResponseWriter, r *http.Request) (interface
 }
 
 // @Tags Contents
+// @Security BearerAuth
 // @Param request body []updateItem true "Lista de Atualizações com IDs"
 // @Success 200 {object} map[string]string
 // @Router /contents [patch]
@@ -131,6 +143,7 @@ func (h *Handler) UpdateBatch(w http.ResponseWriter, r *http.Request) (interface
 }
 
 // @Tags Contents
+// @Security BearerAuth
 // @Param id path int true "ID do Conteúdo"
 // @Success 200 {object} map[string]string
 // @Router /contents/{id} [delete]

@@ -31,12 +31,20 @@ type updateItem struct {
 	Name string `json:"name" validate:"required,min=2,max=50" example:"Ação"`
 }
 
-func (h *Handler) Routes() chi.Router {
+func (h *Handler) Routes(requireAuth, requireContentStaff func(http.Handler) http.Handler) chi.Router {
 	r := chi.NewRouter()
+
 	r.Get("/", httperr.Wrap(h.List))
-	r.Post("/", httperr.Wrap(h.CreateBatch))
-	r.Patch("/", httperr.Wrap(h.UpdateBatch))
-	r.Delete("/{id}", httperr.Wrap(h.Delete))
+
+	r.Group(func(staff chi.Router) {
+		staff.Use(requireAuth)
+		staff.Use(requireContentStaff)
+
+		staff.Post("/", httperr.Wrap(h.CreateBatch))
+		staff.Patch("/", httperr.Wrap(h.UpdateBatch))
+		staff.Delete("/{id}", httperr.Wrap(h.Delete))
+	})
+
 	return r
 }
 
@@ -52,6 +60,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) (interface{}, int
 }
 
 // @Tags Genres
+// @Security BearerAuth
 // @Param request body []createItem true "Lista de Gêneros a cadastrar"
 // @Success 201 {array} domain.Genre
 // @Router /genres [post]
@@ -81,6 +90,7 @@ func (h *Handler) CreateBatch(w http.ResponseWriter, r *http.Request) (interface
 }
 
 // @Tags Genres
+// @Security BearerAuth
 // @Param request body []updateItem true "Lista de Gêneros a atualizar com seus IDs"
 // @Success 200 {object} map[string]string
 // @Router /genres [patch]
@@ -111,6 +121,7 @@ func (h *Handler) UpdateBatch(w http.ResponseWriter, r *http.Request) (interface
 }
 
 // @Tags Genres
+// @Security BearerAuth
 // @Param id path int true "ID do Gênero"
 // @Success 200 {object} map[string]string
 // @Router /genres/{id} [delete]

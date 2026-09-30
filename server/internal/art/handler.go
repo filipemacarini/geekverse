@@ -51,22 +51,6 @@ type artResponse struct {
 	Author      authorResponse `json:"author"`
 }
 
-func mapArtToResponse(art *domain.Art) *artResponse {
-	return &artResponse{
-		ID:          art.ID,
-		Title:       art.Title,
-		Description: art.Description,
-		ImageURL:    art.ImageURL,
-		LikesCount:  art.LikesCount,
-		CreatedAt:   art.CreatedAt,
-		Author: authorResponse{
-			ID:        art.Profile.ID,
-			Username:  art.Profile.Username,
-			AvatarURL: art.Profile.AvatarURL,
-		},
-	}
-}
-
 func (h *Handler) authorizeMutation(r *http.Request, id uint) (*domain.Art, int, error) {
 	art, err := h.store.FindByID(id)
 	if err != nil {
@@ -279,4 +263,20 @@ func (h *Handler) RemoveLike(w http.ResponseWriter, r *http.Request) (interface{
 		return nil, http.StatusInternalServerError, httperr.ErrInternal
 	}
 	return map[string]string{"mensagem": "curtida removida"}, http.StatusOK, nil
+}
+
+func mapArtToResponse(art *domain.Art) *artResponse {
+	return &artResponse{
+		ID:          art.ID,
+		Title:       art.Title,
+		Description: art.Description,
+		ImageURL:    art.ImageURL,
+		LikesCount:  art.LikesCount,
+		CreatedAt:   art.CreatedAt,
+		Author: authorResponse{
+			ID:        art.Profile.ID,
+			Username:  art.Profile.Username,
+			AvatarURL: art.Profile.AvatarURL,
+		},
+	}
 }
