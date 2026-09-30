@@ -6,6 +6,7 @@ import (
 	"geekverse/internal/domain"
 	"geekverse/internal/platform/auth"
 	"geekverse/internal/platform/httperr"
+	"geekverse/internal/platform/pagination"
 	"geekverse/internal/platform/validator"
 	"net/http"
 	"strconv"
@@ -51,28 +52,6 @@ type artResponse struct {
 	Author      authorResponse `json:"author"`
 }
 
-func (h *Handler) authorizeMutation(r *http.Request, id uint) (*domain.Art, int, error) {
-	art, err := h.store.FindByID(id)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, http.StatusNotFound, errors.New("arte não encontrada")
-		}
-		return nil, http.StatusInternalServerError, httperr.ErrInternal
-	}
-
-	callerID := auth.GetProfileID(r.Context())
-	callerRole := auth.GetRole(r.Context())
-
-	isOwner := art.ProfileID == callerID
-	isStaff := callerRole == "admin" || callerRole == "moderator"
-
-	if !isOwner && !isStaff {
-		return nil, http.StatusForbidden, errors.New("você não tem permissão para alterar esta arte")
-	}
-
-	return art, http.StatusOK, nil
-}
-
 func (h *Handler) Routes(requireAuth func(http.Handler) http.Handler) chi.Router {
 	r := chi.NewRouter()
 
@@ -94,10 +73,14 @@ func (h *Handler) Routes(requireAuth func(http.Handler) http.Handler) chi.Router
 }
 
 // @Tags Arts
-// @Success 200 {array} artResponse
+// @Param page query int false "Número da página"
+// @Param limit query int false "Itens por página"
+// @Success 200 {object} pagination.Result{data=[]artResponse}
 // @Router /arts [get]
 func (h *Handler) List(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
-	arts, err := h.store.FindAll()
+	p := pagination.GetParams(r)
+
+	arts, total, err := h.store.FindAll(p.Page, p.Limit)
 	if err != nil {
 		return nil, http.StatusInternalServerError, httperr.ErrInternal
 	}
@@ -106,7 +89,8 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) (interface{}, int
 	for _, a := range arts {
 		response = append(response, *mapArtToResponse(&a))
 	}
-	return response, http.StatusOK, nil
+
+	return pagination.NewResult(response, total, p), http.StatusOK, nil
 }
 
 // @Tags Arts
@@ -279,4 +263,26 @@ func mapArtToResponse(art *domain.Art) *artResponse {
 			AvatarURL: art.Profile.AvatarURL,
 		},
 	}
+}
+
+func (h *Handler) authorizeMutation(r *http.Request, id uint) (*domain.Art, int, error) {
+	art, err := h.store.FindByID(id)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, http.StatusNotFound, errors.New("arte não encontrada")
+		}
+		return nil, http.StatusInternalServerError, httperr.ErrInternal
+	}
+
+	callerID := auth.GetProfileID(r.Context())
+	callerRole := auth.GetRole(r.Context())
+
+	isOwner := art.ProfileID == callerID
+	isStaff := callerRole == "admin" || callerRole == "moderator"
+
+	if !isOwner && !isStaff {
+		return nil, http.StatusForbidden, errors.New("você não tem permissão para alterar esta arte")
+	}
+
+	return art, http.StatusOK, nil
 }

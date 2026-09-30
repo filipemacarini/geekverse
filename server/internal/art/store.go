@@ -15,10 +15,24 @@ func NewStore(db *gorm.DB) *Store {
 	return &Store{db: db}
 }
 
-func (s *Store) FindAll() ([]domain.Art, error) {
+func (s *Store) FindAll(page, limit int) ([]domain.Art, int64, error) {
 	var arts []domain.Art
-	err := s.db.Preload("Profile").Order("created_at DESC").Find(&arts).Error
-	return arts, err
+	var total int64
+
+	query := s.db.Model(&domain.Art{})
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	offset := (page - 1) * limit
+	err := query.Preload("Profile").
+		Order("created_at DESC").
+		Offset(offset).
+		Limit(limit).
+		Find(&arts).Error
+
+	return arts, total, err
 }
 
 func (s *Store) FindByID(id uint) (*domain.Art, error) {

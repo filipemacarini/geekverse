@@ -18,21 +18,33 @@ func (s *Store) Create(title *domain.Title) error {
 	return s.db.Create(title).Error
 }
 
-func (s *Store) FindAll(mediaType string) ([]domain.Title, error) {
+func (s *Store) FindAll(mediaType string, page, limit int) ([]domain.Title, int64, error) {
 	var titles []domain.Title
-	query := s.db.Model(&domain.Title{}).Select(`
-		titles.*,
-		(SELECT COUNT(id) FROM contents WHERE contents.title_id = titles.id) AS episode_count,
-		EXISTS(SELECT 1 FROM contents WHERE contents.title_id = titles.id AND language = 'sub') AS has_sub,
-		EXISTS(SELECT 1 FROM contents WHERE contents.title_id = titles.id AND language = 'dub') AS has_dub
-	`).Preload("Genres")
+	var total int64
 
+	query := s.db.Model(&domain.Title{})
 	if mediaType != "" {
 		query = query.Where("type = ?", mediaType)
 	}
 
-	err := query.Find(&titles).Error
-	return titles, err
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	offset := (page - 1) * limit
+	err := query.Select(`
+		titles.*,
+		(SELECT COUNT(id) FROM contents WHERE contents.title_id = titles.id) AS episode_count,
+		EXISTS(SELECT 1 FROM contents WHERE contents.title_id = titles.id AND language = 'sub') AS has_sub,
+		EXISTS(SELECT 1 FROM contents WHERE contents.title_id = titles.id AND language = 'dub') AS has_dub
+	`).
+		Preload("Genres").
+		Order("id DESC").
+		Offset(offset).
+		Limit(limit).
+		Find(&titles).Error
+
+	return titles, total, err
 }
 
 func (s *Store) FindByID(id uint) (*domain.Title, error) {

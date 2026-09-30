@@ -5,6 +5,7 @@ import (
 	"errors"
 	"geekverse/internal/domain"
 	"geekverse/internal/platform/httperr"
+	"geekverse/internal/platform/pagination"
 	"geekverse/internal/platform/validator"
 	"net/http"
 	"strconv"
@@ -33,7 +34,7 @@ type createRequest struct {
 	Source          string `json:"source" example:"ID000001"`
 	PublicationYear int    `json:"publication_year" validate:"required" example:"2024"`
 
-	GenreIDs []uint `json:"genre_ids" example:"[1, 3]"`
+	GenreIDs []uint `json:"genre_ids"`
 }
 
 type updateRequest struct {
@@ -69,15 +70,20 @@ func (h *Handler) Routes(requireAuth, requireContentStaff func(http.Handler) htt
 }
 
 // @Tags Titles
-// @Success 200 {array} domain.Title
+// @Param type query string false "Filtrar por tipo (anime, manga, novel)"
+// @Param page query int false "Número da página"
+// @Param limit query int false "Itens por página"
+// @Success 200 {object} pagination.Result{data=[]domain.Title}
 // @Router /titles [get]
 func (h *Handler) List(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	mediaType := r.URL.Query().Get("type")
-	titles, err := h.store.FindAll(mediaType)
+	p := pagination.GetParams(r)
+
+	titles, total, err := h.store.FindAll(mediaType, p.Page, p.Limit)
 	if err != nil {
 		return nil, http.StatusInternalServerError, httperr.ErrInternal
 	}
-	return titles, http.StatusOK, nil
+	return pagination.NewResult(titles, total, p), http.StatusOK, nil
 }
 
 // @Tags Titles
