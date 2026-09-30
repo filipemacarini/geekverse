@@ -10,7 +10,7 @@ GET http://localhost:5000/titles
 
 ###
 
-GET http://localhost:5000/titles?type=novel
+GET http://localhost:5000/titles?type=novel&page=2&limit=10
 
 ###
 
@@ -188,7 +188,7 @@ apikey: {{$dotenv SUPABASE_KEY}}
 Content-Type: application/json
 
 {
-    "email": "dev_gv4@teste.com",
+    "email": "dev_gv2@teste.com",
     "password": "senha123456"
 }
 
@@ -274,7 +274,7 @@ Authorization: Bearer {{authToken}}
 
 ###
 
-GET http://localhost:5000/arts
+GET http://localhost:5000/arts?limit=15
 
 ###
 

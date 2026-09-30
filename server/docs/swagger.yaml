@@ -310,6 +310,18 @@ definitions:
     - id
     - name
     type: object
+  pagination.Result:
+    properties:
+      data: {}
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
   profile.updateRequest:
     properties:
       avatar_url:
@@ -333,6 +345,60 @@ definitions:
     - role
     type: object
   title.createRequest:
+    properties:
+      age_rating:
+        enum:
+        - L
+        - "12"
+        - "14"
+        - "16"
+        - "18"
+        example: "16"
+        type: string
+      banner_url:
+        example: https://exemplo.com/banner.jpg
+        type: string
+      cover_url:
+        example: https://exemplo.com/capa.jpg
+        type: string
+      genre_ids:
+        items:
+          type: integer
+        type: array
+      name:
+        example: Solo Leveling
+        maxLength: 150
+        minLength: 2
+        type: string
+      publication_year:
+        example: 2024
+        type: integer
+      source:
+        example: ID000001
+        type: string
+      status:
+        enum:
+        - releasing
+        - completed
+        example: releasing
+        type: string
+      synopsis:
+        example: O caçador mais fraco do mundo...
+        type: string
+      type:
+        enum:
+        - anime
+        - manga
+        - novel
+        example: anime
+        type: string
+    required:
+    - age_rating
+    - cover_url
+    - name
+    - publication_year
+    - status
+    - type
     type: object
   title.updateRequest:
     properties:
@@ -383,13 +449,27 @@ info:
 paths:
   /arts:
     get:
+      parameters:
+      - description: Número da página
+        in: query
+        name: page
+        type: integer
+      - description: Itens por página
+        in: query
+        name: limit
+        type: integer
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/art.artResponse'
-            type: array
+            allOf:
+            - $ref: '#/definitions/pagination.Result'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/art.artResponse'
+                  type: array
+              type: object
       tags:
       - Arts
     post:
@@ -768,13 +848,31 @@ paths:
       - Profiles
   /titles:
     get:
+      parameters:
+      - description: Filtrar por tipo (anime, manga, novel)
+        in: query
+        name: type
+        type: string
+      - description: Número da página
+        in: query
+        name: page
+        type: integer
+      - description: Itens por página
+        in: query
+        name: limit
+        type: integer
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/domain.Title'
-            type: array
+            allOf:
+            - $ref: '#/definitions/pagination.Result'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/domain.Title'
+                  type: array
+              type: object
       tags:
       - Titles
     post:
