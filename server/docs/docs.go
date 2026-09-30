@@ -22,6 +22,12 @@ const docTemplate = `{
                 ],
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Buscar por título da arte",
+                        "name": "q",
+                        "in": "query"
+                    },
+                    {
                         "type": "integer",
                         "description": "Número da página",
                         "name": "page",
@@ -692,8 +698,20 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
+                        "description": "Buscar por nome da obra",
+                        "name": "q",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "description": "Filtrar por tipo (anime, manga, novel)",
                         "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Filtrar por ID do gênero",
+                        "name": "genre_id",
                         "in": "query"
                     },
                     {

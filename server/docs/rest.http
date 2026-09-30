@@ -14,6 +14,14 @@ GET http://localhost:5000/titles?type=novel&page=2&limit=10
 
 ###
 
+GET http://localhost:5000/titles?genre_id=7
+
+###
+
+GET http://localhost:5000/titles?q=So
+
+###
+
 GET http://localhost:5000/titles/{{titleId}}
 
 ### 
@@ -24,7 +32,7 @@ Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 {
-    "name": "Teste com contents e genres e erro",
+    "name": "Solo leveling",
     "synopsis": "Sinópse Teste",
     "cover_url": "http://teste.com/cover.png",
     "banner_url": "http://teste.com/banner.png",
@@ -33,7 +41,7 @@ Content-Type: application/json
     "status": "completed",
     "source": "http://teste.com/source",
     "publication_year": 2026,
-    "genre_ids": [3, 2]
+    "genre_ids": [7]
 }
 
 @titleId = {{createTitle.response.body.id}}
@@ -265,7 +273,7 @@ Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
 {
-    "title": "Minha Primeira Fanart do Goku",
+    "title": "Vegeta",
     "description": "Feito no iPad Pro. Deu muito trabalho!",
     "image_url": "https://storage.exemplo.com/arts/goku-super.png"
 }
@@ -274,7 +282,7 @@ Authorization: Bearer {{authToken}}
 
 ###
 
-GET http://localhost:5000/arts?limit=15
+GET http://localhost:5000/arts?q=ve
 
 ###
 

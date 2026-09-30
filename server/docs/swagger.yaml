@@ -450,6 +450,10 @@ paths:
   /arts:
     get:
       parameters:
+      - description: Buscar por título da arte
+        in: query
+        name: q
+        type: string
       - description: Número da página
         in: query
         name: page
@@ -849,10 +853,18 @@ paths:
   /titles:
     get:
       parameters:
+      - description: Buscar por nome da obra
+        in: query
+        name: q
+        type: string
       - description: Filtrar por tipo (anime, manga, novel)
         in: query
         name: type
         type: string
+      - description: Filtrar por ID do gênero
+        in: query
+        name: genre_id
+        type: integer
       - description: Número da página
         in: query
         name: page
