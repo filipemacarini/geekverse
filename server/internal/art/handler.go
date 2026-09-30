@@ -73,14 +73,16 @@ func (h *Handler) Routes(requireAuth func(http.Handler) http.Handler) chi.Router
 }
 
 // @Tags Arts
+// @Param q query string false "Buscar por título da arte"
 // @Param page query int false "Número da página"
 // @Param limit query int false "Itens por página"
 // @Success 200 {object} pagination.Result{data=[]artResponse}
 // @Router /arts [get]
 func (h *Handler) List(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
+	q := r.URL.Query().Get("q")
 	p := pagination.GetParams(r)
 
-	arts, total, err := h.store.FindAll(p.Page, p.Limit)
+	arts, total, err := h.store.FindAll(q, p.Page, p.Limit)
 	if err != nil {
 		return nil, http.StatusInternalServerError, httperr.ErrInternal
 	}

@@ -18,13 +18,23 @@ func (s *Store) Create(title *domain.Title) error {
 	return s.db.Create(title).Error
 }
 
-func (s *Store) FindAll(mediaType string, page, limit int) ([]domain.Title, int64, error) {
+func (s *Store) FindAll(mediaType string, q string, genreID uint, page, limit int) ([]domain.Title, int64, error) {
 	var titles []domain.Title
 	var total int64
 
 	query := s.db.Model(&domain.Title{})
+
 	if mediaType != "" {
-		query = query.Where("type = ?", mediaType)
+		query = query.Where("titles.type = ?", mediaType)
+	}
+
+	if q != "" {
+		query = query.Where("titles.name ILIKE ?", "%"+q+"%")
+	}
+
+	if genreID > 0 {
+		query = query.Joins("JOIN title_genres ON title_genres.title_id = titles.id").
+			Where("title_genres.genre_id = ?", genreID)
 	}
 
 	if err := query.Count(&total).Error; err != nil {
@@ -39,7 +49,7 @@ func (s *Store) FindAll(mediaType string, page, limit int) ([]domain.Title, int6
 		EXISTS(SELECT 1 FROM contents WHERE contents.title_id = titles.id AND language = 'dub') AS has_dub
 	`).
 		Preload("Genres").
-		Order("id DESC").
+		Order("titles.id DESC").
 		Offset(offset).
 		Limit(limit).
 		Find(&titles).Error

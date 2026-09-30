@@ -15,11 +15,15 @@ func NewStore(db *gorm.DB) *Store {
 	return &Store{db: db}
 }
 
-func (s *Store) FindAll(page, limit int) ([]domain.Art, int64, error) {
+func (s *Store) FindAll(q string, page, limit int) ([]domain.Art, int64, error) {
 	var arts []domain.Art
 	var total int64
 
 	query := s.db.Model(&domain.Art{})
+
+	if q != "" {
+		query = query.Where("title ILIKE ?", "%"+q+"%")
+	}
 
 	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, err

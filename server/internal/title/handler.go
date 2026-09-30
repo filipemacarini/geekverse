@@ -70,16 +70,20 @@ func (h *Handler) Routes(requireAuth, requireContentStaff func(http.Handler) htt
 }
 
 // @Tags Titles
+// @Param q query string false "Buscar por nome da obra"
 // @Param type query string false "Filtrar por tipo (anime, manga, novel)"
+// @Param genre_id query int false "Filtrar por ID do gênero"
 // @Param page query int false "Número da página"
 // @Param limit query int false "Itens por página"
 // @Success 200 {object} pagination.Result{data=[]domain.Title}
 // @Router /titles [get]
 func (h *Handler) List(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
+	q := r.URL.Query().Get("q")
 	mediaType := r.URL.Query().Get("type")
+	genreID, _ := strconv.Atoi(r.URL.Query().Get("genre_id"))
 	p := pagination.GetParams(r)
 
-	titles, total, err := h.store.FindAll(mediaType, p.Page, p.Limit)
+	titles, total, err := h.store.FindAll(mediaType, q, uint(genreID), p.Page, p.Limit)
 	if err != nil {
 		return nil, http.StatusInternalServerError, httperr.ErrInternal
 	}
