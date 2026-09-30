@@ -69,7 +69,8 @@ func setupRoutes(db *gorm.DB, storageClient *storage.Client, authValidator *auth
 
 	favoriteStore := favorite.NewStore(db)
 	favoriteHandler := favorite.NewHandler(favoriteStore)
-	r.Mount("/profiles/{profile_id}/favorites", favoriteHandler.Routes())
+	r.Mount("/favorites", favoriteHandler.Routes(requireAuth))
+	r.Mount("/profiles/{id}/favorites", favoriteHandler.PublicRoutes())
 
 	artStore := art.NewStore(db)
 	artHandler := art.NewHandler(artStore)
