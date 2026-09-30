@@ -219,6 +219,11 @@ const docTemplate = `{
         },
         "/contents": {
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Contents"
                 ],
@@ -251,6 +256,11 @@ const docTemplate = `{
         },
         "/contents/{id}": {
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Contents"
                 ],
@@ -259,6 +269,91 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "ID do Conteúdo",
                         "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/favorites": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "Favorites"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Favorite"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/favorites/{title_id}": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "Favorites"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Obra",
+                        "name": "title_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "tags": [
+                    "Favorites"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da Obra",
+                        "name": "title_id",
                         "in": "path",
                         "required": true
                     }
@@ -294,6 +389,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Genres"
                 ],
@@ -324,6 +424,11 @@ const docTemplate = `{
                 }
             },
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Genres"
                 ],
@@ -356,6 +461,11 @@ const docTemplate = `{
         },
         "/genres/{id}": {
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Genres"
                 ],
@@ -480,6 +590,33 @@ const docTemplate = `{
                 }
             }
         },
+        "/profiles/{id}/favorites": {
+            "get": {
+                "tags": [
+                    "Favorites"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "UUID do Perfil",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Favorite"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/profiles/{id}/role": {
             "patch": {
                 "security": [
@@ -521,99 +658,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/profiles/{profile_id}/favorites": {
-            "get": {
-                "tags": [
-                    "Favorites"
-                ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "UUID do Perfil",
-                        "name": "profile_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/domain.Favorite"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/profiles/{profile_id}/favorites/{title_id}": {
-            "post": {
-                "tags": [
-                    "Favorites"
-                ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "UUID do Perfil",
-                        "name": "profile_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "ID da Obra",
-                        "name": "title_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "tags": [
-                    "Favorites"
-                ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "UUID do Perfil",
-                        "name": "profile_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "ID da Obra",
-                        "name": "title_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/titles": {
             "get": {
                 "tags": [
@@ -632,6 +676,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Titles"
                 ],
@@ -680,6 +729,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Titles"
                 ],
@@ -705,6 +759,11 @@ const docTemplate = `{
                 }
             },
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Titles"
                 ],
@@ -738,6 +797,11 @@ const docTemplate = `{
         },
         "/titles/{title_id}/contents": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "tags": [
                     "Contents"
                 ],

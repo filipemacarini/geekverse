@@ -521,6 +521,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       tags:
       - Contents
   /contents/{id}:
@@ -538,8 +540,60 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       tags:
       - Contents
+  /favorites:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Favorite'
+            type: array
+      security:
+      - BearerAuth: []
+      tags:
+      - Favorites
+  /favorites/{title_id}:
+    delete:
+      parameters:
+      - description: ID da Obra
+        in: path
+        name: title_id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - Favorites
+    post:
+      parameters:
+      - description: ID da Obra
+        in: path
+        name: title_id
+        required: true
+        type: integer
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      tags:
+      - Favorites
   /genres:
     get:
       responses:
@@ -568,6 +622,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       tags:
       - Genres
     post:
@@ -587,6 +643,8 @@ paths:
             items:
               $ref: '#/definitions/domain.Genre'
             type: array
+      security:
+      - BearerAuth: []
       tags:
       - Genres
   /genres/{id}:
@@ -604,6 +662,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       tags:
       - Genres
   /profiles:
@@ -634,6 +694,23 @@ paths:
             $ref: '#/definitions/domain.Profile'
       tags:
       - Profiles
+  /profiles/{id}/favorites:
+    get:
+      parameters:
+      - description: UUID do Perfil
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Favorite'
+            type: array
+      tags:
+      - Favorites
   /profiles/{id}/role:
     patch:
       parameters:
@@ -659,66 +736,6 @@ paths:
       - BearerAuth: []
       tags:
       - Profiles
-  /profiles/{profile_id}/favorites:
-    get:
-      parameters:
-      - description: UUID do Perfil
-        in: path
-        name: profile_id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/domain.Favorite'
-            type: array
-      tags:
-      - Favorites
-  /profiles/{profile_id}/favorites/{title_id}:
-    delete:
-      parameters:
-      - description: UUID do Perfil
-        in: path
-        name: profile_id
-        required: true
-        type: string
-      - description: ID da Obra
-        in: path
-        name: title_id
-        required: true
-        type: integer
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      tags:
-      - Favorites
-    post:
-      parameters:
-      - description: UUID do Perfil
-        in: path
-        name: profile_id
-        required: true
-        type: string
-      - description: ID da Obra
-        in: path
-        name: title_id
-        required: true
-        type: integer
-      responses:
-        "201":
-          description: Created
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      tags:
-      - Favorites
   /profiles/me:
     get:
       responses:
@@ -773,6 +790,8 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/domain.Title'
+      security:
+      - BearerAuth: []
       tags:
       - Titles
   /titles/{id}:
@@ -790,6 +809,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       tags:
       - Titles
     get:
@@ -824,6 +845,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/domain.Title'
+      security:
+      - BearerAuth: []
       tags:
       - Titles
   /titles/{title_id}/contents:
@@ -849,6 +872,8 @@ paths:
             items:
               $ref: '#/definitions/domain.Content'
             type: array
+      security:
+      - BearerAuth: []
       tags:
       - Contents
   /upload/arts:

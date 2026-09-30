@@ -20,6 +20,7 @@ GET http://localhost:5000/titles/{{titleId}}
 
 # @name createTitle
 POST http://localhost:5000/titles
+Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 {
@@ -40,6 +41,7 @@ Content-Type: application/json
 ###
 
 PATCH http://localhost:5000/titles/{{titleId}}
+Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 {
@@ -50,11 +52,13 @@ Content-Type: application/json
 ###
 
 DELETE http://localhost:5000/titles/{{titleId}}
+Authorization: Bearer {{authToken}}
 
 ### CONTENTS
 
 # @name createContents
 POST http://localhost:5000/titles/{{titleId}}/contents
+Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 [
@@ -78,6 +82,7 @@ Content-Type: application/json
 
 # @name createContents
 POST http://localhost:5000/titles/{{titleId}}/contents
+Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 [
@@ -100,6 +105,7 @@ Content-Type: application/json
 ###
 
 PATCH http://localhost:5000/contents
+Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 [
@@ -111,12 +117,14 @@ Content-Type: application/json
 
 ###
 
-DELETE http://localhost:5000/contents/18
+DELETE http://localhost:5000/contents/20
+Authorization: Bearer {{authToken}}
 
 ### GENRES
 
 POST http://localhost:5000/genres
 Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
 [
   { "name": "Acao" },
@@ -133,21 +141,23 @@ GET http://localhost:5000/genres
 
 PATCH http://localhost:5000/genres
 Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
 [
   {
-    "id": 1,
+    "id": 5,
     "name": "Comédia"
   },
   {
-    "id": 2,
-    "name": "Ação"
+    "id": 3,
+    "name": "ROMCOM"
   }
 ]
 
 ###
 
-DELETE http://localhost:5000/genres/5
+DELETE http://localhost:5000/genres/3
+Authorization: Bearer {{authToken}}
 
 ### PROFILES
 
@@ -191,7 +201,7 @@ apikey: {{$dotenv SUPABASE_KEY}}
 Content-Type: application/json
 
 {
-    "email": "dev_gv2@teste.com",
+    "email": "dev_gv@teste.com",
     "password": "senha123456"
 }
 
@@ -230,15 +240,22 @@ Authorization: Bearer {{authToken}}
 
 ### FAVORITES
 
-POST http://localhost:5000/profiles/{{profileId}}/favorites/10
+POST http://localhost:5000/favorites/10
+Authorization: Bearer {{authToken}}
 
 ###
 
-GET http://localhost:5000/profiles/{{profileId}}/favorites
+GET http://localhost:5000/favorites
+Authorization: Bearer {{authToken}}
 
 ###
 
-DELETE http://localhost:5000/profiles/{{profileId}}/favorites/5
+GET http://localhost:5000/profiles/88a37402-d723-4bb8-b33a-960826bd04dd/favorites
+
+###
+
+DELETE http://localhost:5000/favorites/5
+Authorization: Bearer {{authToken}}
 
 ### ARTS
 
