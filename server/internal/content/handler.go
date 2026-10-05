@@ -23,7 +23,7 @@ func NewHandler(store *Store) *Handler {
 
 type createItem struct {
 	Title     string   `json:"title" validate:"required,min=2,max=150" example:"Episódio 1 - O Despertar"`
-	Season    uint     `json:"season" validate:"min=0" example:"1"`
+	Season    float64  `json:"season" validate:"min=0" example:"1.0"`
 	Episode   *float64 `json:"episode" example:"1.0"`
 	Language  string   `json:"language" validate:"required,oneof=sub dub none" example:"sub"`
 	SourceURL string   `json:"source_url" validate:"required,url" example:"https://stream.exemplo.com/ep1.mp4"`
@@ -33,7 +33,7 @@ type createItem struct {
 type updateItem struct {
 	ID        uint     `json:"id" validate:"required" example:"1"`
 	Title     *string  `json:"title" validate:"omitempty,min=2,max=150"`
-	Season    *uint    `json:"season"`
+	Season    *float64 `json:"season"`
 	Episode   *float64 `json:"episode"`
 	Language  *string  `json:"language" validate:"omitempty,oneof=sub dub none"`
 	SourceURL *string  `json:"source_url" validate:"omitempty,url"`
