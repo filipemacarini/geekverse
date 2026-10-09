@@ -19,6 +19,15 @@ export default defineConfig({
     tailwindcss(),
     tsconfigPaths(),
   ],
+  server: {
+    proxy: {
+      "/api/mangadex": {
+        target: "https://api.mangadex.org",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/mangadex/, ""),
+      },
+    },
+  },
   optimizeDeps: {
     include: [
       "@supabase/supabase-js", "zod", "sonner", "lucide-react", "clsx", "tailwind-merge", "class-variance-authority",
